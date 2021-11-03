@@ -67,8 +67,8 @@ namespace MirAI
             prog.Nodes[1].Y = 100;
             prog.Nodes[2].X = 10;
             prog.Nodes[2].Y = 200;
-            prog.Nodes[3].X = 1200;
-            prog.Nodes[3].Y = 1300;
+            prog.Nodes[3].X = 100;
+            prog.Nodes[3].Y = 200;
             // Установка связей между Нодами
             prog.AddLink(prog.Nodes[0], prog.Nodes[3]);
             prog.AddLink(prog.Nodes[0], prog.Nodes[1]);
