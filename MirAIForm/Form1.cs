@@ -17,6 +17,7 @@ namespace MirAI.Forma
     {
         private List<UnitUI> units = new List<UnitUI>();
         public Program curentProgram;
+        private static Pen linkPen = new Pen(UnitUI.linkColor, 3);
         public Form1()
         {
             InitializeComponent();
@@ -32,6 +33,7 @@ namespace MirAI.Forma
                 listBox1.SetSelected(0, true);
                 curentProgram = listBox1.SelectedItem as Program;
             }
+            UnitUI.Mover = UnitMover;
         }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -48,11 +50,7 @@ namespace MirAI.Forma
                 int ucount = p.Nodes.Count;
                 for (int i = 0; i < ucount; i++)
                 {
-                    units.Add(new UnitUI
-                    {
-                        Location = new Point(p.Nodes[i].X, p.Nodes[i].Y),
-                        refNode = p.Nodes[i]
-                    });
+                    units.Add(new UnitUI { Location = new Point(p.Nodes[i].X, p.Nodes[i].Y), refNode = p.Nodes[i] });
                     panel1.Controls.Add(units[i]);
                 }
                 panel1.ResumeLayout(false);
@@ -62,7 +60,6 @@ namespace MirAI.Forma
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
-            Pen linkPen = new Pen(Color.White, 3);
             foreach (var line in GetLinks())
             {
                 e.Graphics.DrawLine(linkPen, line.x1, line.y1, line.x2, line.y2);
@@ -101,13 +98,13 @@ namespace MirAI.Forma
                     if (fromNode != null && fromNode.Next != null && fromNode.Next.Count > 0)
                     {
                         int fromX = fromUnit.Left + fromUnit.Width / 2;
-                        int fromY = fromUnit.Top + fromUnit.Height;
+                        int fromY = fromUnit.Top + fromUnit.Height - UnitUI.connectorSize;
                         foreach (var toNode in fromNode.Next)
                         {
                             UnitUI toUnit = units.Find(u => u.refNode == toNode);
                             if (toNode.Type != NodeType.Root && toUnit != null)
                             {
-                                yield return (fromX, fromY, toUnit.Left + toUnit.Width / 2, toUnit.Top);
+                                yield return (fromX, fromY, toUnit.Left + toUnit.Width / 2, toUnit.Top + UnitUI.connectorSize);
                             }
                         }
                     }
@@ -117,6 +114,37 @@ namespace MirAI.Forma
 
         private void panel1_MouseMove(object sender, MouseEventArgs e)
         {
+        }
+
+        private void UnitMover(UnitUI unit, Size offset)
+        {
+            curentProgram.UnDiscover();
+            DFCmover(unit, offset);
+        }
+
+        private bool DFCmover(UnitUI unit, Size offset)
+        {
+            Node node = unit.refNode;
+            if (!node.discovered)
+            {
+                node.discovered = true;
+                int newLeft = unit.Left + offset.Width;
+                int newTop = unit.Top + offset.Height;
+                if (newLeft < 0 || newTop < 0)
+                    return false;
+                if (node.Type != NodeType.SubAI)
+                {
+                    foreach (var nextNode in node.Next)
+                    {
+                        UnitUI nextUnit = units.Find(u => u.refNode == nextNode);
+                        if (!DFCmover(nextUnit, offset))
+                            return false;
+                    }
+                }
+                unit.refNode.X = unit.Left = newLeft;
+                unit.refNode.Y = unit.Top = newTop;
+            }
+            return true;
         }
     }
 }
