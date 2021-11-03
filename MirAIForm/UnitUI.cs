@@ -89,17 +89,15 @@ namespace MirAI.Forma
         {
             if (e.Button == MouseButtons.Left)
             {
-                Size parentSize = this.Parent.Size;
-
                 int newLeft = Left + e.X - pointUnderUnit.X;
-                //if (newLeft > 0 && newLeft + Width < parentSize.Width)
+                if (newLeft > 0)
                 {
                     Left = newLeft;
                     refNode.X = Left;
                 }
 
                 int newTop = Top + e.Y - pointUnderUnit.Y;
-                //if (newTop > 0 && newTop + Height < parentSize.Height)
+                if (newTop > 0)
                 {
                     Top = newTop;
                     refNode.Y = Top;
@@ -107,7 +105,7 @@ namespace MirAI.Forma
                 this.Parent.Refresh();
             }
         }
-        private readonly Pen borderPen = new Pen(Color.Red, 3);
+        //private readonly Pen borderPen = new Pen(Color.Red, 3);
         private void UnitUI_Paint(object sender, PaintEventArgs e)
         {
             if (refNode != null)

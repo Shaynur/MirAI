@@ -86,7 +86,7 @@ namespace MirAI.Forma
                    ((e.X >= Math.Min(line.x1, line.x2)) && (e.X <= Math.Max(line.x1, line.x2))) &&
                          ((e.Y >= Math.Min(line.y1, line.y2)) && (e.Y <= Math.Max(line.y1, line.y2))))
                 {
-                    MessageBox.Show("Упс!");
+                    MessageBox.Show("Упс!");  //TODO RemoveLink
                 }
             }
         }
@@ -113,6 +113,10 @@ namespace MirAI.Forma
                     }
                 }
             }
+        }
+
+        private void panel1_MouseMove(object sender, MouseEventArgs e)
+        {
         }
     }
 }
