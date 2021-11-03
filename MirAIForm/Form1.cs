@@ -1,6 +1,7 @@
 ﻿using MirAI.AI;
 using MirAI.DB;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -61,21 +62,53 @@ namespace MirAI.Forma
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
+            Pen linkPen = new Pen(Color.White, 3);
+            foreach (var line in GetLinks())
+            {
+                e.Graphics.DrawLine(linkPen, line.x1, line.y1, line.x2, line.y2);
+            }
+        }
+
+        private void panel1_MouseDown(object sender, MouseEventArgs e)
+        {
+            foreach (var line in GetLinks())
+            {
+                float delta = 0.04F;
+                float z;
+                if (line.x1 == line.x2)
+                    z = line.x1 - e.X;
+                else if (line.y1 == line.y2)
+                    z = line.y1 - e.Y;
+                else
+                    z = (e.X - line.x1) / (line.x2 - line.x1) - (e.Y - line.y1) / (line.y2 - line.y1);
+
+                if ((Math.Abs(z) < delta) &&
+                   ((e.X >= Math.Min(line.x1, line.x2)) && (e.X <= Math.Max(line.x1, line.x2))) &&
+                         ((e.Y >= Math.Min(line.y1, line.y2)) && (e.Y <= Math.Max(line.y1, line.y2))))
+                {
+                    MessageBox.Show("Упс!");
+                }
+            }
+        }
+
+        private IEnumerable<(float x1, float y1, float x2, float y2)> GetLinks()
+        {
             if (units.Count > 1)
             {
-                Pen linkPen = new Pen(Color.White, 3);
                 foreach (var fromUnit in units)
                 {
                     Node fromNode = fromUnit.refNode;
                     if (fromNode != null && fromNode.Next != null && fromNode.Next.Count > 0)
                     {
-                        int ux = fromUnit.Left + fromUnit.Width / 2;
-                        int uy = fromUnit.Top + fromUnit.Height;
+                        int fromX = fromUnit.Left + fromUnit.Width / 2;
+                        int fromY = fromUnit.Top + fromUnit.Height;
                         foreach (var toNode in fromNode.Next)
                         {
                             UnitUI toUnit = units.Find(u => u.refNode == toNode);
                             if (toNode.Type != NodeType.Root && toUnit != null)
-                                e.Graphics.DrawLine(linkPen, ux, uy, toUnit.Left + toUnit.Width / 2, toUnit.Top);
+                            {
+                                yield return (fromX, fromY, toUnit.Left + toUnit.Width / 2, toUnit.Top);
+                            }
                         }
                     }
                 }

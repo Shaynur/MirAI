@@ -71,7 +71,6 @@ namespace MirAI.Forma
                     }
                     if (gPath.PointCount > 0)
                         Region = new Region(gPath);
-
                 }
             }
         }
