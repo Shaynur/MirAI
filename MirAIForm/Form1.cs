@@ -21,6 +21,7 @@ namespace MirAI.Forma
         public Form1()
         {
             InitializeComponent();
+            UnitUI.Mover = UnitMover;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -33,7 +34,6 @@ namespace MirAI.Forma
                 listBox1.SetSelected(0, true);
                 curentProgram = listBox1.SelectedItem as Program;
             }
-            UnitUI.Mover = UnitMover;
         }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -118,33 +118,31 @@ namespace MirAI.Forma
 
         private void UnitMover(UnitUI unit, Size offset)
         {
-            curentProgram.UnDiscover();
-            DFCmover(unit, offset);
-        }
+            Node startNode = unit.refNode;
 
-        private bool DFCmover(UnitUI unit, Size offset)
-        {
-            Node node = unit.refNode;
-            if (!node.discovered)
+            curentProgram.UnDiscover();
+            foreach (var node in curentProgram.DFC(startNode))
             {
-                node.discovered = true;
-                int newLeft = unit.Left + offset.Width;
-                int newTop = unit.Top + offset.Height;
+                UnitUI nextUnit = units.Find(u => u.refNode == node);
+                int newLeft = nextUnit.Left + offset.Width;
+                int newTop = nextUnit.Top + offset.Height;
                 if (newLeft < 0 || newTop < 0)
-                    return false;
-                if (node.Type != NodeType.SubAI)
-                {
-                    foreach (var nextNode in node.Next)
-                    {
-                        UnitUI nextUnit = units.Find(u => u.refNode == nextNode);
-                        if (!DFCmover(nextUnit, offset))
-                            return false;
-                    }
-                }
-                unit.refNode.X = unit.Left = newLeft;
-                unit.refNode.Y = unit.Top = newTop;
+                    return;
+                if (node.Type == NodeType.SubAI)
+                    node.discovered = true;
             }
-            return true;
+
+            curentProgram.UnDiscover();
+            foreach ( var node in curentProgram.DFC(startNode))
+            {
+                UnitUI nextUnit = units.Find(u => u.refNode == node); 
+                int newLeft = nextUnit.Left + offset.Width;
+                int newTop = nextUnit.Top + offset.Height;
+                nextUnit.refNode.X = nextUnit.Left = newLeft;
+                nextUnit.refNode.Y = nextUnit.Top = newTop;
+                if (node.Type == NodeType.SubAI)
+                    node.discovered = true;
+            }
         }
     }
 }

@@ -10,7 +10,7 @@ namespace MirAI.AI
     public delegate bool NodeAIValidator(Node node);
 
     [Table("Nodes")]
-    public class Node //: IEquatable<Node>
+    public class Node
     {
         public int Id { get; set; }
         public int ProgramId { get; set; }
@@ -37,7 +37,7 @@ namespace MirAI.AI
         {
             if (this.Type == NodeType.Action ||
                 node is null ||
-                ((this.Type == NodeType.SubAI) && (node.Type != NodeType.Root)) ||
+                ((this.Type == NodeType.SubAI) && ((node.Type != NodeType.Root)||(this.Next.Count > 0))) ||
                 this.Next.Contains(node))
                 return false;
             Next.Add(node);
@@ -65,35 +65,6 @@ namespace MirAI.AI
                 return Validator.Invoke(this);
             return false;
         }
-        /*
-                //-------------------------------------------------------------------------
-                // Блок методов для реализации интерфейса IEquatable<Node>
-                //-------------------------------------------------------------------------
-                public override bool Equals(object obj)
-                {
-                    if (obj == null) return false;
-                    Node objAsNodeAI = obj as Node;
-                    if (objAsNodeAI == null) return false;
-                    else return Equals(objAsNodeAI);
-                }
-                public override int GetHashCode()
-                {
-                    return Id.GetHashCode();
-                }
-                public bool Equals(Node other)
-                {
-                    if (other is null) return false;
-                    return (this.Id.Equals(other.Id));
-                }
-                public static bool operator ==(Node node1, Node node2)
-                {
-                    return node1.Equals(node2);
-                }
-                public static bool operator !=(Node node1, Node node2)
-                {
-                    return !node1.Equals(node2);
-                }
-        */
         //-------------------------------------------------------------------------
         /// <summary>
         /// Переопределение метода ToString для класса Node

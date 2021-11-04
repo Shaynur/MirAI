@@ -30,12 +30,17 @@ namespace MirAI
 
             Program prog = programs[0];
             int len = 0;
-            prog.CheckProgram(ref len, ref programs);
-            Console.WriteLine($"\nДлина программы '{prog.Name}' (только Action и Condition с учетом подпрограмм): {len}");
+            Console.WriteLine($"\nКорректная длина программы? {prog.CheckProgram(ref len, ref programs)}");
+            Console.WriteLine($"Длина программы '{prog.Name}' (только Action и Condition с учетом подпрограмм): {len}");
 
             Console.WriteLine($"Запуск программы '{prog.Name}'.");
             Node n = prog.Run(ref programs);
-            Console.WriteLine($"Результат программы '{prog.Name}': {n.Id}.{n.Type} из '{programs.Find(p=>p.Id== n.ProgramId).Name}'");
+            //Node n = null;
+            Console.Write($"Результат программы '{prog.Name}': ");
+            if (n is null)
+                Console.WriteLine($"null");
+            else
+                Console.WriteLine($"{n.Id}.{n.Type} из '{programs.Find(p => p.Id == n.ProgramId).Name}'");
 
             Console.WriteLine("\n=> OK");
             Console.Read();
@@ -79,6 +84,7 @@ namespace MirAI
             prog2.AddNode(NodeType.Connector);
             prog2.AddNode(NodeType.Condition);
             prog2.AddNode(NodeType.Action);
+            //prog2.AddNode(NodeType.SubAI);
             prog2.Nodes[2].Command = 777;
             prog2.Nodes[3].Command = 777;
             prog2.AddLink(prog2.Nodes[0], prog2.Nodes[1]);
@@ -100,12 +106,15 @@ namespace MirAI
             prog.AddLink(prog.Nodes[3], prog2.Nodes[0]);
             prog.Save();
 
+            prog2.AddLink(prog2.Nodes[3], prog.Nodes[0]);
+            prog2.Save();
+
         }
 
-        public static bool CheckNode( Node node )
+        public static bool CheckNode(Node node)
         {
             bool ret = (node.Command == 777);
-            Console.WriteLine($"\tCheckNode({node.Id}.{node.Type}) = {ret}");
+            Console.WriteLine($"\tCheckNode({node.Id}.{node.Type}) = {ret}"); //TODO временно (Run trace)
             return ret;
         }
 

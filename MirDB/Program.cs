@@ -24,7 +24,7 @@ namespace MirAI.AI
         /// Максимальная длинна программы ( учитываются только ноды действия и ноды условий.
         /// Длинну можно проверить функцией 'CheckProgram()'
         /// </summary>
-        public static int MaxLenght { get; set; } = 1000;
+        public static int MaxLenght { get; set; } = 10;
         public Program() { }
         public Program(string name)
         {
@@ -51,7 +51,7 @@ namespace MirAI.AI
         /// <returns>true если связь была установленна, false если связь невозможна</returns>
         public bool AddLink(Node owner, Node child)
         {
-            if (!(owner is null) && !(child is null) && Nodes.Contains(owner) &&    // проверка нодов на 'null' и принадлежность 'owner' списку 'Nodes'
+            if (!(owner is null) && !(child is null) && Nodes.Contains(owner) &&
                 (((owner.Type != NodeType.SubAI) && Nodes.Contains(child)) ||
                  ((owner.Type == NodeType.SubAI) && !Nodes.Contains(child))))
             {
@@ -79,64 +79,42 @@ namespace MirAI.AI
         /// <returns>Первая валидная нода действия или 'null' если такой не существует</returns>
         public Node Run(ref List<Program> programs)
         {
-            UnDiscover();
             Node curnode = Nodes.Find(n => n.Type == NodeType.Root);
+            Console.WriteLine($"Run({this.Name})"); ///TODO временно (Run trace)
             if (!(curnode is null))
             {
-                curnode.discovered = true;
-                Console.WriteLine($"{curnode.Id}.{curnode.Type} в Run({this.Name})"); //TODO временно
-                curnode = DFC(curnode, ref programs);
-            }
-            return curnode;
-        }
-
-        /// <summary>
-        /// Рекурсивная реализация DFS (Depth-first search).
-        /// Просматривает все связанные ноды программы в поисках валидной
-        /// ноды действия.
-        /// </summary>
-        /// <param name="node">Нода от которой делать просмотр</param>
-        /// <param name="programs">Ссылка на список всех программ для возможности
-        /// переходов на подпрограммы</param>
-        /// <returns>Первая валидная нода действия или 'null' если такой не существует</returns>
-        private Node DFC(Node node, ref List<Program> programs)
-        {
-            Node ret = null;
-            foreach (var n in node.Next)          // Ноды в 'node.Next' должны быть уже упорядочены в порядке их просмотра
-            {                                     // согласно правилам игры.
-                if (ret != null)
-                    break;
-                if (!n.discovered)
+                UnDiscover();
+                foreach (var node in DFC(curnode))
                 {
-                    n.discovered = true;
-                    Console.WriteLine($"{n.Id}.{n.Type} в DFC({node.Id})"); //TODO временно
-                    switch (n.Type)
+                    Console.WriteLine($"{node.Id}.{node.Type}"); //TODO временно (Run trace)
+                    switch (node.Type)
                     {
                         case NodeType.Action:
                             {
-                                if (n.IsValid())
-                                    ret = n;
+                                if (node.IsValid())
+                                    return node;
                                 break;
                             }
                         case NodeType.Root:
                         case NodeType.Connector:
                             {
-                                ret = DFC(n, ref programs);
                                 break;
                             }
                         case NodeType.Condition:
                             {
-                                if (n.IsValid())
-                                    ret = DFC(n, ref programs);
+                                if (!node.IsValid())
+                                    node.discovered = true;
                                 break;
                             }
                         case NodeType.SubAI:
                             {
-                                if (n.Next.Count > 0)
+                                node.discovered = true;
+                                if (node.Next.Count > 0)
                                 {
-                                    Node nextrootnode = n.Next[0];
-                                    Program nextprog = programs.Find(p => p.Id == nextrootnode.ProgramId);
-                                    ret = nextprog.Run(ref programs);
+                                    Program nextprog = programs.Find(p => p.Id == node.Next[0].ProgramId);
+                                    Node rn = nextprog.Run(ref programs);
+                                    if (rn != null)
+                                        return rn;
                                 }
                                 break;
                             }
@@ -145,31 +123,28 @@ namespace MirAI.AI
                     }
                 }
             }
-            return ret;
+            return null;
         }
 
+        /// <summary>
+        /// Подсчет длины программы с учетом всех подпрограмм и проверка на превышение максимального
+        /// размера (Program.MaxLenght)
+        /// </summary>
+        /// <param name="lenght">Ссылка на счетчик</param>
+        /// <param name="programs">Ссылка на список всех программ для возможности
+        /// переходов на подпрограммы</param>
+        /// <returns>true если размер не превышает Program.MaxLenght, false если превышает</returns>
         public bool CheckProgram(ref int lenght, ref List<Program> programs)
         {
-            UnDiscover();
             Node curnode = Nodes.Find(n => n.Type == NodeType.Root);
             if (!(curnode is null))
             {
-                curnode.discovered = true;
-                CheckDFC(curnode, ref lenght, ref programs);
-            }
-            return (lenght <= MaxLenght);
-        }
-
-        private void CheckDFC(Node node, ref int lenght, ref List<Program> programs)
-        {
-            foreach (var n in node.Next)
-            {
-                if (lenght > MaxLenght)
-                    return;
-                if (!n.discovered)
+                UnDiscover();
+                foreach (var node in DFC(curnode))
                 {
-                    n.discovered = true;
-                    switch (n.Type)
+                    if (lenght > MaxLenght)
+                        return false;
+                    switch (node.Type)
                     {
                         case NodeType.Action:
                             {
@@ -179,27 +154,50 @@ namespace MirAI.AI
                         case NodeType.Root:
                         case NodeType.Connector:
                             {
-                                CheckDFC(n, ref lenght, ref programs);
                                 break;
                             }
                         case NodeType.Condition:
                             {
                                 lenght++;
-                                CheckDFC(n, ref lenght, ref programs);
                                 break;
                             }
                         case NodeType.SubAI:
                             {
-                                if (n.Next.Count > 0)
+                                node.discovered = true;
+                                if (node.Next.Count > 0)
                                 {
-                                    Node nextrootnode = n.Next[0];
-                                    Program nextprog = programs.Find(p => p.Id == nextrootnode.ProgramId);
-                                    nextprog.CheckProgram(ref lenght, ref programs);
+                                    Program nextprog = programs.Find(p => p.Id == node.Next[0].ProgramId);
+                                    if (!nextprog.CheckProgram(ref lenght, ref programs))
+                                        return false;
                                 }
                                 break;
                             }
                         default:            // неизвестный тип ноды просто пропускается
                             break;
+                    }
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Рекурсивный итератор всех нод вглубь начиная с fromNode.
+        /// Перед первым использованием обнулить флаги просмотра вызовом UnDiscover()
+        /// </summary>
+        /// <param name="fromNode">Нода с которой начинать перечисление вглубь включая ее саму</param>
+        /// <returns>Последовательность нод</returns>
+        public IEnumerable<Node> DFC(Node fromNode)
+        {
+            if (!fromNode.discovered)
+                yield return fromNode;
+            if (!fromNode.discovered)
+            {
+                fromNode.discovered = true;
+                foreach (var node in fromNode.Next)
+                {
+                    foreach (var n in DFC(node))
+                    {
+                        yield return n;
                     }
                 }
             }
