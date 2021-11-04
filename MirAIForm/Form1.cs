@@ -98,13 +98,13 @@ namespace MirAI.Forma
                     if (fromNode != null && fromNode.Next != null && fromNode.Next.Count > 0)
                     {
                         int fromX = fromUnit.Left + fromUnit.Width / 2;
-                        int fromY = fromUnit.Top + fromUnit.Height - UnitUI.connectorSize;
+                        int fromY = fromUnit.Top + fromUnit.Height - UnitUI.connectorR;
                         foreach (var toNode in fromNode.Next)
                         {
                             UnitUI toUnit = units.Find(u => u.refNode == toNode);
                             if (toNode.Type != NodeType.Root && toUnit != null)
                             {
-                                yield return (fromX, fromY, toUnit.Left + toUnit.Width / 2, toUnit.Top + UnitUI.connectorSize);
+                                yield return (fromX, fromY, toUnit.Left + toUnit.Width / 2, toUnit.Top + UnitUI.connectorR);
                             }
                         }
                     }
