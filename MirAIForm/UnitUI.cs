@@ -28,73 +28,9 @@ namespace MirAI.Forma
                 _refNode = value;
                 if (_refNode != null)
                 {
-                    GraphicsPath gPath = new GraphicsPath { FillMode = FillMode.Winding };
-                    switch (_refNode.Type)
-                    {
-                        case NodeType.Root:
-                            {
-                                Height = 60;
-                                BackColor = Color.Gray;
-                                AddRoundedRectangle(ref gPath, new Rectangle(0, 0, Width, Height - connectorR), 6);
-                                //AddRoundedRectangle(ref gPath, new Rectangle(0, 0 + connectorR, Width, Height - connectorR * 2), 6);
-                                break;
-                            }
-                        case NodeType.Action:
-                            {
-                                Width = 160;
-                                Height = 100;
-                                AddRoundedRectangle(ref gPath, new Rectangle(0, connectorR, Width, Height - connectorR), 4);
-                                //AddRoundedRectangle(ref gPath, new Rectangle(0, 0 + connectorR, Width, Height - connectorR * 2), 4);
-                                BackColor = Color.LemonChiffon;
-                                break;
-                            }
-                        case NodeType.Condition:
-                            {
-                                Width = 160;
-                                Height = 100;
-                                gPath.AddEllipse(0, 0 + connectorR, Height, Height - connectorR * 2);
-                                gPath.AddEllipse(Width - Height - 1, 0 + connectorR, Height, Height - connectorR * 2);
-                                gPath.AddRectangle(new Rectangle(Height / 2, 0 + connectorR, Width - Height - 1, Height - connectorR * 2));
-                                BackColor = Color.LightSkyBlue;
-                                break;
-                            }
-                        case NodeType.Connector:
-                            {
-                                Width = 60;
-                                Height = 80;
-                                gPath.AddEllipse(0, 0 + connectorR, Width, Height - connectorR * 2);
-                                BackColor = Color.DeepSkyBlue;
-                                break;
-                            }
-                        case NodeType.SubAI:
-                            {
-                                AddRoundedRectangle(ref gPath, new Rectangle(0, connectorR, Width, Height - connectorR), 4);
-                                //AddRoundedRectangle(ref gPath, new Rectangle(0, 0 + connectorR, Width, Height - connectorR * 2), 4);
-                                BackColor = Color.LightGray;
-                                break;
-                            }
-                        default:
-                            break;
-                    }
-                    if (refNode.Type != NodeType.Root)
-                        gPath.AddEllipse(Width / 2 - connectorR, 0, connectorR * 2, connectorR * 2);
-                    if (refNode.Type != NodeType.Action && refNode.Type != NodeType.SubAI)
-                        gPath.AddEllipse(Width / 2 - connectorR, Height - connectorR * 2, connectorR * 2, connectorR * 2);
-                    Region = new Region(gPath);
+                    SetRegion();
                 }
             }
-        }
-
-        public static void AddRoundedRectangle(ref GraphicsPath path, Rectangle r, int radius)
-        {
-            int d = radius * 2;
-            path.AddEllipse(r.Right - d-1, r.Top, d, d);
-            path.AddEllipse(r.Right - d-1, r.Bottom - d-1, d, d);
-            path.AddEllipse(r.Left, r.Bottom - d-1, d, d);
-            path.AddEllipse(r.Left, r.Top, d, d);
-            path.AddRectangle(new Rectangle(r.Left + radius, r.Top, r.Width - d, r.Height));
-            path.AddRectangle(new Rectangle(r.Left, r.Top + radius, r.Width, r.Height - d));
-            path.CloseFigure();
         }
 
         public UnitUI()
@@ -102,9 +38,71 @@ namespace MirAI.Forma
             InitializeComponent();
         }
 
+        private void SetRegion()
+        {
+            GraphicsPath gPath = new GraphicsPath { FillMode = FillMode.Winding };
+            switch (_refNode.Type)
+            {
+                case NodeType.Root:
+                    {
+                        Height = 60;
+                        BackColor = Color.Gray;
+                        AddRoundedRectangle(ref gPath, new Rectangle(0, 0, Width, Height - connectorR), 6);
+                        //AddRoundedRectangle(ref gPath, new Rectangle(0, 0 + connectorR, Width, Height - connectorR * 2), 6);
+                        break;
+                    }
+                case NodeType.Action:
+                    {
+                        Width = 160;
+                        Height = 100;
+                        AddRoundedRectangle(ref gPath, new Rectangle(0, connectorR, Width, Height - connectorR), 4);
+                        //AddRoundedRectangle(ref gPath, new Rectangle(0, 0 + connectorR, Width, Height - connectorR * 2), 4);
+                        BackColor = Color.LemonChiffon;
+                        break;
+                    }
+                case NodeType.Condition:
+                    {
+                        Width = 160;
+                        Height = 100;
+                        gPath.AddEllipse(0, 0 + connectorR, Height, Height - connectorR * 2);
+                        gPath.AddEllipse(Width - Height - 1, 0 + connectorR, Height, Height - connectorR * 2);
+                        gPath.AddRectangle(new Rectangle(Height / 2, 0 + connectorR, Width - Height - 1, Height - connectorR * 2));
+                        BackColor = Color.LightSkyBlue;
+                        break;
+                    }
+                case NodeType.Connector:
+                    {
+                        Width = 60;
+                        Height = 80;
+                        gPath.AddEllipse(0, 0 + connectorR, Width, Height - connectorR * 2);
+                        BackColor = Color.DeepSkyBlue;
+                        break;
+                    }
+                case NodeType.SubAI:
+                    {
+                        AddRoundedRectangle(ref gPath, new Rectangle(0, connectorR, Width, Height - connectorR), 4);
+                        //AddRoundedRectangle(ref gPath, new Rectangle(0, 0 + connectorR, Width, Height - connectorR * 2), 4);
+                        BackColor = Color.LightGray;
+                        break;
+                    }
+                default:
+                    break;
+            }
+            if (refNode.Type != NodeType.Root)
+                gPath.AddEllipse(Width / 2 - connectorR, 0, connectorR * 2, connectorR * 2);
+            if (refNode.Type != NodeType.Action && refNode.Type != NodeType.SubAI)
+                gPath.AddEllipse(Width / 2 - connectorR, Height - connectorR * 2, connectorR * 2, connectorR * 2);
+            Region = new Region(gPath);
+        }
+
         private void UnitUI_MouseDown(object sender, MouseEventArgs e)
         {
             pointUnderUnit = e.Location;
+        }
+
+        private void UnitUI_MouseUp(object sender, MouseEventArgs e)
+        {
+            this.Parent.Refresh();
         }
 
         private void UnitUI_MouseMove(object sender, MouseEventArgs e)
@@ -126,18 +124,25 @@ namespace MirAI.Forma
                 e.Graphics.DrawString(refNode.Type.ToString(), drawFont, drawBrush, 10, Height / 3);
                 if (refNode.Type != NodeType.Root)
                 {
-                    e.Graphics.DrawEllipse(linkPen, Width / 2 - connectorR+1, 0+1, connectorR * 2-4, connectorR * 2-5);
+                    e.Graphics.DrawEllipse(linkPen, Width / 2 - connectorR + 1, 0 + 1, connectorR * 2 - 4, connectorR * 2 - 5);
                 }
                 if (refNode.Type != NodeType.Action && refNode.Type != NodeType.SubAI)
                 {
-                    e.Graphics.FillEllipse(linkBrush, Width / 2 - connectorR-1, Height - connectorR * 2-1, connectorR * 2, connectorR * 2);
+                    e.Graphics.FillEllipse(linkBrush, Width / 2 - connectorR - 1, Height - connectorR * 2 - 1, connectorR * 2, connectorR * 2);
                 }
             }
         }
-
-        private void UnitUI_MouseUp(object sender, MouseEventArgs e)
+        private static void AddRoundedRectangle(ref GraphicsPath path, Rectangle r, int radius)
         {
-            this.Parent.Refresh();
+            int d = radius * 2;
+            path.AddEllipse(r.Right - d - 1, r.Top, d, d);
+            path.AddEllipse(r.Right - d - 1, r.Bottom - d - 1, d, d);
+            path.AddEllipse(r.Left, r.Bottom - d - 1, d, d);
+            path.AddEllipse(r.Left, r.Top, d, d);
+            path.AddRectangle(new Rectangle(r.Left + radius, r.Top, r.Width - d, r.Height));
+            path.AddRectangle(new Rectangle(r.Left, r.Top + radius, r.Width, r.Height - d));
+            path.CloseFigure();
         }
+
     }
 }

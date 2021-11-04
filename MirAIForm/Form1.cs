@@ -122,9 +122,6 @@ namespace MirAI.Forma
         {
             if (e.Button == MouseButtons.Left)
             {
-                //int dx = (e.X > pointUnderPanel.X) ? 1 : -1;
-                //int dy = (e.Y > pointUnderPanel.Y) ? 1 : -1;
-                //Point newSP = new Point(-panel1.AutoScrollPosition.X + dx, -panel1.AutoScrollPosition.Y + dy);
                 Point newSP = new Point(oldPanelPos.X - (e.X - pointUnderPanel.X), oldPanelPos.Y - (e.Y - pointUnderPanel.Y));
                 panel1.AutoScrollPosition = newSP;
             }
