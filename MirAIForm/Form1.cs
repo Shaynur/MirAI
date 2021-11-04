@@ -18,6 +18,9 @@ namespace MirAI.Forma
         private List<UnitUI> units = new List<UnitUI>();
         public Program curentProgram;
         private static Pen linkPen = new Pen(UnitUI.linkColor, 3);
+        private Point pointUnderPanel;
+        private Point oldPanelPos;
+
         public Form1()
         {
             InitializeComponent();
@@ -68,6 +71,9 @@ namespace MirAI.Forma
 
         private void panel1_MouseDown(object sender, MouseEventArgs e)
         {
+            pointUnderPanel = e.Location;// + (Size)panel1.AutoScrollPosition;
+            oldPanelPos.X = -panel1.AutoScrollPosition.X;
+            oldPanelPos.Y = -panel1.AutoScrollPosition.Y;
             foreach (var line in GetLinks())
             {
                 float delta = 0.04F;
@@ -114,6 +120,14 @@ namespace MirAI.Forma
 
         private void panel1_MouseMove(object sender, MouseEventArgs e)
         {
+            if (e.Button == MouseButtons.Left)
+            {
+                //int dx = (e.X > pointUnderPanel.X) ? 1 : -1;
+                //int dy = (e.Y > pointUnderPanel.Y) ? 1 : -1;
+                //Point newSP = new Point(-panel1.AutoScrollPosition.X + dx, -panel1.AutoScrollPosition.Y + dy);
+                Point newSP = new Point(oldPanelPos.X - (e.X - pointUnderPanel.X), oldPanelPos.Y - (e.Y - pointUnderPanel.Y));
+                panel1.AutoScrollPosition = newSP;
+            }
         }
 
         private void UnitMover(UnitUI unit, Size offset)
@@ -133,9 +147,9 @@ namespace MirAI.Forma
             }
 
             curentProgram.UnDiscover();
-            foreach ( var node in curentProgram.DFC(startNode))
+            foreach (var node in curentProgram.DFC(startNode))
             {
-                UnitUI nextUnit = units.Find(u => u.refNode == node); 
+                UnitUI nextUnit = units.Find(u => u.refNode == node);
                 int newLeft = nextUnit.Left + offset.Width;
                 int newTop = nextUnit.Top + offset.Height;
                 nextUnit.refNode.X = nextUnit.Left = newLeft;
