@@ -42,6 +42,12 @@ namespace MirAI.AI
             Nodes.Add(node);
             return node;
         }
+        public Node AddNode(NodeType type, Node ownerNode)
+        {
+            Node node = AddNode(type);
+            AddLink(ownerNode, node);
+            return node;
+        }
 
         /// <summary>
         /// Установка связи между двумя нодами программы

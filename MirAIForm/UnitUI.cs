@@ -14,12 +14,15 @@ namespace MirAI.Forma
     {
         public delegate void MoverHandler(UnitUI unit, Size offset);
         public static MoverHandler Mover;
+        public static MoverHandler SetLink;
         public static Color linkColor = Color.LightGray;
         private static Pen linkPen = new Pen(linkColor, 4);
         private static SolidBrush linkBrush = new SolidBrush(linkColor);
         public static int connectorR = 8;
         private Point pointUnderUnit;
+        public Point mouseMovePos;
         private Node _refNode;
+        public bool moveLink = false;
         public Node refNode
         {
             get { return _refNode; }
@@ -97,21 +100,40 @@ namespace MirAI.Forma
 
         private void UnitUI_MouseDown(object sender, MouseEventArgs e)
         {
+            if (refNode.Type != NodeType.Action && refNode.Type != NodeType.SubAI) // нельзя тянуть линк от Action и SubAI 
+            {
+                Rectangle rect = new Rectangle(Width / 2 - connectorR, Height - connectorR * 2, connectorR * 2, connectorR * 2); // область нижнего коннектора
+                if (rect.Contains(e.Location))  // мышка "ухватила" нижний коннектор
+                {
+                    moveLink = true;
+                }
+            }
             pointUnderUnit = e.Location;
         }
 
         private void UnitUI_MouseUp(object sender, MouseEventArgs e)
         {
+            //MessageBox.Show($"UnitUI_MouseUp in {this.Name}");
+            if( moveLink )
+            {
+                SetLink(this, (Size)e.Location);
+            }
+            moveLink = false;
             this.Parent.Refresh();
         }
 
         private void UnitUI_MouseMove(object sender, MouseEventArgs e)
         {
+            mouseMovePos = e.Location;
             if (e.Button == MouseButtons.Left)
             {
-                Size offset = new Size(e.X - pointUnderUnit.X, e.Y - pointUnderUnit.Y);
-                Mover(this, offset);
-                this.Parent.Refresh();
+                if (!moveLink)
+                {
+                    Size offset = new Size(e.X - pointUnderUnit.X, e.Y - pointUnderUnit.Y);
+                    Mover(this, offset);
+                }
+                else
+                    this.Parent.Refresh();
             }
         }
 
