@@ -12,9 +12,10 @@ namespace MirAI.Forma
 {
     public partial class UnitUI : UserControl
     {
-        public delegate void MoverHandler(UnitUI unit, Size offset);
+        public delegate void MoverHandler(UnitUI unit, Point offset);
         public static MoverHandler Mover;
         public static MoverHandler SetLink;
+        public static MoverHandler SelectUnit;
         public static Color linkColor = Color.LightGray;
         private static Pen linkPen = new Pen(linkColor, 4);
         private static SolidBrush linkBrush = new SolidBrush(linkColor);
@@ -23,6 +24,8 @@ namespace MirAI.Forma
         public Point mouseMovePos;
         private Node _refNode;
         public bool moveLink = false;
+        public bool moveUnit = false;
+        public bool isSelected = false;
         public Node refNode
         {
             get { return _refNode; }
@@ -113,12 +116,14 @@ namespace MirAI.Forma
 
         private void UnitUI_MouseUp(object sender, MouseEventArgs e)
         {
-            //MessageBox.Show($"UnitUI_MouseUp in {this.Name}");
-            if( moveLink )
+            if (moveLink)
             {
-                SetLink(this, (Size)e.Location);
+                SetLink(this, e.Location);
             }
             moveLink = false;
+            if (!moveUnit)
+                SelectUnit(this, e.Location);
+            moveUnit = false;
             this.Parent.Refresh();
         }
 
@@ -127,9 +132,10 @@ namespace MirAI.Forma
             mouseMovePos = e.Location;
             if (e.Button == MouseButtons.Left)
             {
+                moveUnit = true;
                 if (!moveLink)
                 {
-                    Size offset = new Size(e.X - pointUnderUnit.X, e.Y - pointUnderUnit.Y);
+                    Point offset = new Point(e.X - pointUnderUnit.X, e.Y - pointUnderUnit.Y);
                     Mover(this, offset);
                 }
                 else
@@ -166,5 +172,8 @@ namespace MirAI.Forma
             path.CloseFigure();
         }
 
+        private void UnitUI_MouseClick(object sender, MouseEventArgs e)
+        {
+        }
     }
 }

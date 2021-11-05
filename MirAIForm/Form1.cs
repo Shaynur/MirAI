@@ -17,20 +17,26 @@ namespace MirAI.Forma
     {
         private List<UnitUI> units = new List<UnitUI>();
         public Program curentProgram;
-        private static Pen linkPen = new Pen(UnitUI.linkColor, 3);
+        private static Pen linkPen = new Pen(UnitUI.linkColor, 5);
+        private static Pen selectPen = new Pen(Color.Red, 3);
         private Point mousePressedPos;
         //private Point mouseMovePos;
         private Point oldPanelPos;
+        private int selectedUnit;
 
         public Form1()
         {
             InitializeComponent();
             UnitUI.Mover = UnitMover;
             UnitUI.SetLink = SetLinkTo;
+            UnitUI.SelectUnit = SelectUnit;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            panel1.Controls.Clear();
+            curentProgram = null;
+            listBox1.DataSource = null;
             listBox1.Items.Clear();
             listBox1.DataSource = MirDBRoutines.GetPrograms(true);
             listBox1.DisplayMember = "Name";
@@ -62,6 +68,7 @@ namespace MirAI.Forma
                 AddUnit(curentProgram.Nodes[i]);
             }
             panel1.ResumeLayout(false);
+            selectedUnit = -1;
             Refresh();
         }
         private UnitUI AddUnit(Node node)
@@ -95,6 +102,15 @@ namespace MirAI.Forma
                     e.Graphics.DrawLine(linkPen, fromX, fromY, unit.Left + mouseMovePos.X, unit.Top + mouseMovePos.Y);
                 }
             }
+            if (selectedUnit != -1)
+            {
+                int border = 5;
+                e.Graphics.DrawRectangle(selectPen,
+                                         units[selectedUnit].Left - border,
+                                         units[selectedUnit].Top - border,
+                                         units[selectedUnit].Width + border * 2,
+                                         units[selectedUnit].Height + border * 2);
+            }
         }
 
 
@@ -104,20 +120,10 @@ namespace MirAI.Forma
             oldPanelPos = new Point(-panel1.AutoScrollPosition.X, -panel1.AutoScrollPosition.Y);
             foreach (var line in GetLinks())
             {
-                float delta = 0.04F;
-                float z;
-                if (line.from.X == line.to.X)
-                    z = line.from.X - e.X;
-                else if (line.from.Y == line.to.Y)
-                    z = line.from.Y - e.Y;
-                else
-                    z = (e.X - line.from.X) / (line.to.X - line.from.X) - (e.Y - line.from.Y) / (line.to.Y - line.from.Y);
-
-                if ((Math.Abs(z) < delta) &&
-                   ((e.X >= Math.Min(line.from.X, line.to.X)) && (e.X <= Math.Max(line.from.X, line.to.X))) &&
-                         ((e.Y >= Math.Min(line.from.Y, line.to.Y)) && (e.Y <= Math.Max(line.from.Y, line.to.Y))))
+                float linkSize = LineLenght(line.from, line.to);
+                float mouseSize = LineLenght(line.from, e.Location) + LineLenght(line.to, e.Location);
+                if (mouseSize - linkSize < 0.2)
                 {
-                    //MessageBox.Show("Упс!");  //TODO RemoveLink
                     line.fromNode.Next.Remove(line.toNode);
                     curentProgram.Save();
                     Refresh();
@@ -125,6 +131,12 @@ namespace MirAI.Forma
                 }
             }
         }
+
+        private float LineLenght(PointF pt1, PointF pt2)
+        {
+            return (float)(Math.Sqrt(Math.Pow(pt2.X - pt1.X, 2) + Math.Pow(pt2.Y - pt1.Y, 2)));
+        }
+
         private void panel1_MouseUp(object sender, MouseEventArgs e)
         {
             //MessageBox.Show("panel1_MouseUp");
@@ -165,29 +177,29 @@ namespace MirAI.Forma
                 }
             }
         }
-
-        private void UnitMover(UnitUI unit, Size offset)
+        //---------------------------------------------------------
+        // Обработчики различных событий вызываемые из UnitUI
+        //---------------------------------------------------------
+        private void UnitMover(UnitUI unit, Point offset)
         {
             Node startNode = unit.refNode;
-
             curentProgram.UnDiscover();
             foreach (var node in curentProgram.DFC(startNode))
             {
                 UnitUI nextUnit = units.Find(u => u.refNode == node);
-                int newLeft = nextUnit.Left + offset.Width;
-                int newTop = nextUnit.Top + offset.Height;
+                int newLeft = nextUnit.Left + offset.X;
+                int newTop = nextUnit.Top + offset.Y;
                 if (newLeft < 0 || newTop < 0)
                     return;
                 if (node.Type == NodeType.SubAI)
                     node.discovered = true;
             }
-
             curentProgram.UnDiscover();
             foreach (var node in curentProgram.DFC(startNode))
             {
                 UnitUI nextUnit = units.Find(u => u.refNode == node);
-                int newLeft = nextUnit.Left + offset.Width;
-                int newTop = nextUnit.Top + offset.Height;
+                int newLeft = nextUnit.Left + offset.X;
+                int newTop = nextUnit.Top + offset.Y;
                 nextUnit.refNode.X = nextUnit.Left = newLeft;
                 nextUnit.refNode.Y = nextUnit.Top = newTop;
                 if (node.Type == NodeType.SubAI)
@@ -196,9 +208,9 @@ namespace MirAI.Forma
             Refresh();
         }
 
-        public void SetLinkTo(UnitUI unit, Size offset)
+        private void SetLinkTo(UnitUI unit, Point offset)
         {
-            Point coord = new Point(unit.Left + offset.Width, unit.Top + offset.Height);
+            Point coord = new Point(unit.Left + offset.X, unit.Top + offset.Y);
             foreach (var u in units)
             {
                 Region region = u.Region;
@@ -208,7 +220,6 @@ namespace MirAI.Forma
                 {
                     if (u == unit || u.refNode.Type == NodeType.Root)
                         return;
-                    //MessageBox.Show($"{u.Name}: {coord.X}, {coord.Y} / {offset.Width}, {offset.Height}");
                     if (curentProgram.AddLink(unit.refNode, u.refNode))
                     {
                         curentProgram.Save();
@@ -225,6 +236,36 @@ namespace MirAI.Forma
             newUnit.Left = coord.X - newUnit.Width / 2;
             panel1.ResumeLayout(false);
             curentProgram.Save();
+        }
+
+        private void SelectUnit(UnitUI unit, Point offset)
+        {
+            int newSel = units.IndexOf(unit);
+            if (selectedUnit == -1 || selectedUnit != newSel)
+                selectedUnit = newSel;
+            else
+                selectedUnit = -1;
+        }
+        //---------------------------------------------------------
+
+        private void Form1_KeyUp(object sender, KeyEventArgs e)
+        {
+            //MessageBox.Show($"KeyUp code: {e.KeyCode}, value: {e.KeyValue}");
+            if (e.KeyCode == Keys.Delete && selectedUnit != -1)
+            {
+                if (!curentProgram.RemoveNode(units[selectedUnit].refNode))
+                    return;
+                panel1.Controls.Remove(units[selectedUnit]);
+                units.RemoveAt(selectedUnit);
+                curentProgram.Save();
+                RedrawProgram();
+            }
+        }
+
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            MirDBRoutines.CreateSomeDB();
+            Form1_Load(sender, e);
         }
     }
 }

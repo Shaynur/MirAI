@@ -29,7 +29,7 @@ namespace MirAI.DB
         /// <returns>Коллекция программ</returns>
         public static List<Program> GetPrograms(bool loadNodes)
         {
-            List<Program> programs;// = new List<Program<>();
+            List<Program> programs;
             using (MirDBContext db = new MirDBContext())
             {
                 programs = db.Programs.ToList();
@@ -230,6 +230,72 @@ namespace MirAI.DB
             }
             str.Append($"└─────┴─────┴───────────────┴──────────┴───────────┴────────────────────────────┘\n");
             return str.ToString();
+        }
+
+        public static void CreateSomeDB()
+        {
+            //Console.WriteLine("Очистка БД.");
+            MirDBRoutines.Clear();
+            //Console.WriteLine("Генерация новой БД.");
+
+            Program prog = new Program("ProgAI");
+            Program prog2 = new Program("Sub AI");
+
+            Unit unit = new Unit { UnitProgram = prog };
+            MirDBRoutines.SaveUnit(unit);
+
+            // Добавление Нодов
+            prog.AddNode(NodeType.Root);
+            prog.AddNode(NodeType.Condition);
+            prog.AddNode(NodeType.Action);
+            prog.AddNode(NodeType.SubAI);
+            prog.Nodes[0].Command = 0;
+            prog.Nodes[1].Command = 777;
+            prog.Nodes[2].Command = 7;
+            prog.Nodes[3].Command = 423;
+            prog.Nodes[0].X = 100;
+            prog.Nodes[0].Y = 10;
+            prog.Nodes[1].X = 100;
+            prog.Nodes[1].Y = 100;
+            prog.Nodes[2].X = 10;
+            prog.Nodes[2].Y = 300;
+            prog.Nodes[3].X = 200;
+            prog.Nodes[3].Y = 300;
+            // Установка связей между Нодами
+            prog.AddLink(prog.Nodes[0], prog.Nodes[3]);
+            prog.AddLink(prog.Nodes[0], prog.Nodes[1]);
+            prog.AddLink(prog.Nodes[1], prog.Nodes[3]);
+            prog.AddLink(prog.Nodes[1], prog.Nodes[2]);
+
+            prog2.AddNode(NodeType.Root);
+            prog2.AddNode(NodeType.Connector);
+            prog2.AddNode(NodeType.Condition);
+            prog2.AddNode(NodeType.Action);
+            //prog2.AddNode(NodeType.SubAI);
+            prog2.Nodes[2].Command = 777;
+            prog2.Nodes[3].Command = 777;
+            prog2.Nodes[0].X = 100;
+            prog2.Nodes[0].Y = 10;
+            prog2.Nodes[1].X = 10;
+            prog2.Nodes[1].Y = 100;
+            prog2.Nodes[2].X = 200;
+            prog2.Nodes[2].Y = 100;
+            prog2.Nodes[3].X = 200;
+            prog2.Nodes[3].Y = 300;
+            prog2.AddLink(prog2.Nodes[0], prog2.Nodes[1]);
+            prog2.AddLink(prog2.Nodes[0], prog2.Nodes[2]);
+            prog2.AddLink(prog2.Nodes[1], prog2.Nodes[3]);
+            prog2.AddLink(prog2.Nodes[2], prog2.Nodes[3]);
+
+
+            prog.Save();
+            prog2.Save();
+
+            prog.AddLink(prog.Nodes[3], prog2.Nodes[0]);
+            prog.Save();
+
+            //prog2.AddLink(prog2.Nodes[3], prog.Nodes[0]);
+            //prog2.Save();
         }
     }
 }

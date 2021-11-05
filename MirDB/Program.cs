@@ -73,6 +73,19 @@ namespace MirAI.AI
                 MirDBRoutines.SaveNode(n);
         }
 
+        public bool RemoveNode(Node node)
+        {
+            if (node.Type == NodeType.Root)
+                return false;
+            MirDBRoutines.RemoveNode(node);
+            Nodes.Remove(node);
+            foreach( var nn in Nodes )
+            {
+                nn.Next.Remove(node);
+            }
+            return true;
+        }
+
         /// <summary>
         /// Выполнение программы для получения первого валидного нода действия.
         ///     Программа должна быть уже проверенна на допустимый размер
