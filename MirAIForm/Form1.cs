@@ -52,8 +52,7 @@ namespace MirAI.Forma
             Program p = listBox1.SelectedItem as Program;
             if (curentProgram != p)
             {
-                if (curentProgram != null)
-                    curentProgram.Save();
+                if (curentProgram != null) curentProgram.Save();
                 curentProgram = p;
                 RedrawProgram();
             }
@@ -76,8 +75,7 @@ namespace MirAI.Forma
             int ucount = units.Count + 1;
             UnitUI unit = new UnitUI
             {
-                Location = new Point(node.X,
-                                     node.Y),
+                Location = new Point(node.X, node.Y),
                 refNode = node,
                 Name = "UnitUI" + ucount.ToString()
             };
@@ -124,7 +122,7 @@ namespace MirAI.Forma
                 float mouseSize = LineLenght(line.from, e.Location) + LineLenght(line.to, e.Location);
                 if (mouseSize - linkSize < 0.2)
                 {
-                    line.fromNode.Next.Remove(line.toNode);
+                    line.fromNode.RemoveChildNode(line.toNode);
                     curentProgram.Save();
                     Refresh();
                     break;
@@ -149,16 +147,16 @@ namespace MirAI.Forma
                 foreach (var fromUnit in units)
                 {
                     Node fromNode = fromUnit.refNode;
-                    if (fromNode != null && fromNode.Next != null && fromNode.Next.Count > 0)
+                    if (fromNode != null /*&& fromNode.LinkTo != null*/ && fromNode.LinkTo.Count > 0)
                     {
                         PointF from = new PointF(fromUnit.Left + fromUnit.Width / 2, fromUnit.Top + fromUnit.Height - UnitUI.connectorR);
-                        foreach (var toNode in fromNode.Next)
+                        foreach (var nodeLink in fromNode.LinkTo)
                         {
-                            UnitUI toUnit = units.Find(u => u.refNode == toNode);
-                            if (toNode.Type != NodeType.Root && toUnit != null)
+                            UnitUI toUnit = units.Find(u => u.refNode == nodeLink.To);
+                            if (nodeLink.To.Type != NodeType.Root && toUnit != null)
                             {
                                 PointF to = new PointF(toUnit.Left + toUnit.Width / 2, toUnit.Top + UnitUI.connectorR);
-                                yield return (from, to, fromNode, toNode);
+                                yield return (from, to, fromNode, nodeLink.To);
                             }
                         }
                     }
@@ -222,20 +220,24 @@ namespace MirAI.Forma
                         return;
                     if (curentProgram.AddLink(unit.refNode, u.refNode))
                     {
-                        curentProgram.Save();
-                        Refresh();
+                        curentProgram.Reload();
+                        RedrawProgram();
                     }
                     return;
                 }
             }
-            Node node = curentProgram.AddNode(NodeType.Action, unit.refNode); //TODO Диалог создания нового нода
+            Node node = curentProgram.AddNode(unit.refNode, NodeType.Action); //TODO Диалог создания нового нода
+            panel1.SuspendLayout();
             node.X = coord.X;
             node.Y = coord.Y - UnitUI.connectorR;
-            panel1.SuspendLayout();
             UnitUI newUnit = AddUnit(node);
             newUnit.Left = coord.X - newUnit.Width / 2;
             panel1.ResumeLayout(false);
-            curentProgram.Save();
+            node.X = newUnit.Left;
+            node.Save();
+            //Form1_Load(this, null);
+            curentProgram.Reload();
+            RedrawProgram();
         }
 
         private void SelectUnit(UnitUI unit, Point offset)
@@ -257,7 +259,8 @@ namespace MirAI.Forma
                     return;
                 panel1.Controls.Remove(units[selectedUnit]);
                 units.RemoveAt(selectedUnit);
-                curentProgram.Save();
+                //Form1_Load(this, e);
+                curentProgram.Reload();
                 RedrawProgram();
             }
         }

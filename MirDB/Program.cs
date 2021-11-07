@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using MirAI.DB;
 using ServiceStack.DataAnnotations;
 
@@ -29,24 +31,47 @@ namespace MirAI.AI
         public Program(string name)
         {
             Name = name;
+            Node node = new Node(this.Id, NodeType.Root);
+            Nodes.Add(node);
+            Save();
+        }
+
+        public Node GetRootNode()
+        {
+            return Nodes.Find(n => n.Type == NodeType.Root);
         }
 
         /// <summary>
-        /// Добавить новый пустой нод в список нодов
+        /// Добавление нового нода в программу
+        /// Если указан 'ownerNode', новый нод привязывается к нему
         /// </summary>
-        /// <param name="type">Тип добавляемого нода</param>
-        /// <returns>Добавленный нод</returns>
-        public Node AddNode(NodeType type)
+        /// <param name="ownerNode">Родительский нод</param>
+        /// <param name="type">Тип добавляемого нового нода</param>
+        /// <returns>Добавленный в БД нод</returns>
+        public Node AddNode(Node ownerNode, NodeType type)
         {
             Node node = new Node(this.Id, type);
             Nodes.Add(node);
-            return node;
-        }
-        public Node AddNode(NodeType type, Node ownerNode)
-        {
-            Node node = AddNode(type);
+            node.Save();
             AddLink(ownerNode, node);
             return node;
+        }
+
+        /// <summary>
+        /// Добавление существующего нода в программу и привязка его к родительскому
+        /// </summary>
+        /// <param name="ownerNode">Родительский нод</param>
+        /// <param name="child">Добавляемый нод</param>
+        /// <returns></returns>
+        public bool AddNode(Node ownerNode, Node child)
+        {
+            Nodes.Add(child);
+            if (!AddLink(ownerNode, child))
+            {
+                Nodes.Remove(child);
+                return false;
+            }
+            return true;
         }
 
         /// <summary>
@@ -58,31 +83,64 @@ namespace MirAI.AI
         public bool AddLink(Node owner, Node child)
         {
             if (!(owner is null) && !(child is null) && Nodes.Contains(owner) &&
-                (((owner.Type != NodeType.SubAI) && Nodes.Contains(child)) ||
-                 ((owner.Type == NodeType.SubAI) && !Nodes.Contains(child))))
+                owner.Type != NodeType.Action &&
+                ((owner.Type != NodeType.SubAI && Nodes.Contains(child)) ||
+                 (owner.Type == NodeType.SubAI && !Nodes.Contains(child) && child.Type == NodeType.Root && owner.LinkTo.Count == 0)))
             {
                 return owner.AddChildNode(child);
             }
             return false;
         }
 
-        public void Save()
+        public void Reload()
         {
-            MirDBRoutines.SaveProgramm(this);
-            foreach (var n in Nodes)
-                MirDBRoutines.SaveNode(n);
+            using MirDBContext db = new MirDBContext();
+            var fromdb = db.Programs.Include(p => p.Nodes).ThenInclude(n => n.LinkTo).ThenInclude(l => l.To).SingleOrDefault(p => p.Id == this.Id);
+            if (fromdb != null)
+                this.Nodes = fromdb.Nodes;
+        }
+
+        public Program Save()
+        {
+            using MirDBContext db = new MirDBContext();
+            Save(db);
+            db.SaveChanges();
+            return this;
+        }
+        public Program Save(MirDBContext db)
+        {
+            if (!db.Programs.Contains(this))         // Сначала сохраняем 'Program'
+            {
+                db.Programs.Add(this);
+            }
+            else
+            {
+                var fromdb = db.Programs.SingleOrDefault(p => p.Id == this.Id);
+                fromdb.Name = this.Name;
+                db.Update(fromdb);
+            }
+            foreach (var n in Nodes)                // Потом сохраняем все ноды этой программы
+            {
+                n.Save(db);
+            }
+
+            return this;
         }
 
         public bool RemoveNode(Node node)
         {
             if (node.Type == NodeType.Root)
                 return false;
-            MirDBRoutines.RemoveNode(node);
-            Nodes.Remove(node);
-            foreach( var nn in Nodes )
+            using MirDBContext db = new MirDBContext();
+            var fromdb = db.Nodes.Include(p => p.LinkTo).ThenInclude(u => u.To).SingleOrDefault(p => p.Id == node.Id);
+            if (fromdb != null)             // Удаляем ноду из БД
             {
-                nn.Next.Remove(node);
+                db.Nodes.Remove(fromdb);
+                db.SaveChanges();
+                Nodes.Remove(node);             // Удаляем из локальной 'Program'
             }
+            else
+                return false;
             return true;
         }
 
@@ -128,9 +186,9 @@ namespace MirAI.AI
                         case NodeType.SubAI:
                             {
                                 node.discovered = true;
-                                if (node.Next.Count > 0)
+                                if (node.LinkTo.Count > 0)
                                 {
-                                    Program nextprog = programs.Find(p => p.Id == node.Next[0].ProgramId);
+                                    Program nextprog = programs.Find(p => p.Id == node.LinkTo[0].To.ProgramId);
                                     Node rn = nextprog.Run(ref programs);
                                     if (rn != null)
                                         return rn;
@@ -183,9 +241,9 @@ namespace MirAI.AI
                         case NodeType.SubAI:
                             {
                                 node.discovered = true;
-                                if (node.Next.Count > 0)
+                                if (node.LinkTo.Count > 0)
                                 {
-                                    Program nextprog = programs.Find(p => p.Id == node.Next[0].ProgramId);
+                                    Program nextprog = programs.Find(p => p.Id == node.LinkTo[0].To.ProgramId);
                                     if (!nextprog.CheckProgram(ref lenght, ref programs))
                                         return false;
                                 }
@@ -212,9 +270,9 @@ namespace MirAI.AI
             if (!fromNode.discovered)
             {
                 fromNode.discovered = true;
-                foreach (var node in fromNode.Next)
+                foreach (var nodeLink in fromNode.LinkTo)
                 {
-                    foreach (var n in DFC(node))
+                    foreach (var n in DFC(nodeLink.To))
                     {
                         yield return n;
                     }

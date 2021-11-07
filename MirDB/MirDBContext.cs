@@ -5,15 +5,11 @@ using System;
 
 namespace MirAI.DB
 {
-    /// <summary>
-    /// Контекст БД
-    /// </summary>
     public class MirDBContext : DbContext
     {
         public DbSet<Unit> Units { get; set; }
         public DbSet<Program> Programs { get; set; }
         public DbSet<Node> Nodes { get; set; }
-        public DbSet<NodeLink> Links { get; set; }
 
         public MirDBContext()
         {
@@ -28,11 +24,18 @@ namespace MirAI.DB
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder
-                 .Entity<NodeLink>()
+            modelBuilder.Entity<NodeLink>()
                  .HasKey(c => new { c.FromId, c.ToId });
+            modelBuilder.Entity<NodeLink>()
+                .HasOne(n => n.From)
+                .WithMany(n => n.LinkTo)
+                .HasForeignKey(n => n.FromId);
+            modelBuilder.Entity<NodeLink>()
+                .HasOne(n => n.To)
+                .WithMany(n => n.LinkFrom)
+                .HasForeignKey(n => n.ToId);
 
-            modelBuilder.Entity<Program>().HasAlternateKey(p => p.Name);
+            //modelBuilder.Entity<Program>().HasAlternateKey(p => p.Name);
         }
     }
 }

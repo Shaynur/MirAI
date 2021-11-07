@@ -32,14 +32,7 @@ namespace MirAI.DB
             List<Program> programs;
             using (MirDBContext db = new MirDBContext())
             {
-                programs = db.Programs.ToList();
-                if (loadNodes)
-                {
-                    foreach (var p in programs)
-                    {
-                        p.Nodes = GetNodes(p.Id);
-                    }
-                }
+                programs = db.Programs.Include(p => p.Nodes).ThenInclude(n => n.LinkTo).ToList();
             }
             return programs;
         }
@@ -54,17 +47,7 @@ namespace MirAI.DB
             List<Node> RetNodes;
             using (MirDBContext db = new MirDBContext())
             {
-                var nodes = db.Nodes.Where(p => p.ProgramId == programId).OrderBy(p => p.Type).ToList();
-                List<NodeLink> links = new List<NodeLink>();
-                foreach (var node in nodes)
-                {
-                    links.AddRange(db.Links.Where(n => n.From == node).Include(n => n.To).Include(n => n.From));
-                }
-                foreach (var c in links)
-                {
-                    c.From.AddChildNode(c.To);
-                }
-                RetNodes = nodes.ToList();
+                RetNodes = db.Nodes.Where(p => p.ProgramId == programId).OrderBy(p => p.Type).Include(n => n.LinkTo).ToList();
             }
             return RetNodes;
         }
@@ -107,10 +90,9 @@ namespace MirAI.DB
         public static Program SaveProgramm(Program program)
         {
             using MirDBContext db = new MirDBContext();
-            if (db.Programs.Contains(program))
-                db.Programs.Update(program);
-            else
-                db.Programs.Add(program);
+            var fromdb = db.Programs.SingleOrDefault(p => p.Id == program.Id);
+            fromdb.Nodes = program.Nodes;
+            db.Programs.Update(fromdb);
             db.SaveChanges();
             return program;
         }
@@ -136,23 +118,20 @@ namespace MirAI.DB
         public static void SaveNode(Node node)
         {
             using MirDBContext db = new MirDBContext();
-            // Сохраняем (обновляем) ноду
-            if (db.Nodes.Contains(node))
-                db.Nodes.Update(node);
-            else
-                db.Nodes.Add(node);
-            // Сохраняем (обновляем) связи ноды
-            //      Сначала удаляем все связи текущей ноды в БД,
-            var links = db.Links.Where(n => n.From == node);
-            db.Links.RemoveRange(links);
-            //      потом перезаписываем те связи которые имеются в локальной версии ноды.
-            foreach (var c in node.Next)
+            var nodes = db.Nodes.Where(n => n.Id == node.Id).Include(n => n.LinkTo);
+            foreach (var n in nodes)
             {
-                NodeLink conn = new NodeLink(node, c);
-                db.Links.Add(conn);
-                db.Nodes.Attach(c);
+                if (n.Id == node.Id)
+                {
+                    n.LinkTo = node.LinkTo;
+                    if (db.Nodes.Contains(n))
+                        db.Nodes.Update(n);
+                    else
+                        db.Nodes.Add(n);
+                    db.SaveChanges();
+                    return;
+                }
             }
-            db.SaveChanges();
         }
 
         /// <summary>
@@ -179,16 +158,8 @@ namespace MirAI.DB
             using MirDBContext db = new MirDBContext();
             // получаем объекты из бд и выводим на консоль
             var units = db.Units.ToList();
-            var programms = db.Programs.ToList();
+            var programms = db.Programs.Include(p => p.Nodes).ThenInclude(n => n.LinkTo).ToList();
             var nodes = db.Nodes.ToList();
-            var connections = db.Links.ToList();
-            foreach (var c in connections)
-            {
-                var nf = nodes.Find(x => x.Id == c.FromId);
-                var nt = nodes.Find(x => x.Id == c.ToId);
-                if ((nf != null) && (nt != null))
-                    nf.Next.Add(nt);
-            }
             str.Append("\nДанные из MirDB:\n");
             str.Append(" [Units]\n");
             str.Append($"┌─────┬───────────────┬──────────────────────────────┐\n");
@@ -241,14 +212,14 @@ namespace MirAI.DB
             Program prog = new Program("ProgAI");
             Program prog2 = new Program("Sub AI");
 
-            Unit unit = new Unit { UnitProgram = prog };
-            MirDBRoutines.SaveUnit(unit);
+            //Unit unit = new Unit { UnitProgram = prog };
+            //MirDBRoutines.SaveUnit(unit);
 
             // Добавление Нодов
-            prog.AddNode(NodeType.Root);
-            prog.AddNode(NodeType.Condition);
-            prog.AddNode(NodeType.Action);
-            prog.AddNode(NodeType.SubAI);
+            //prog.AddNode(NodeType.Root);
+            prog.AddNode(prog.Nodes[0], NodeType.Condition);
+            prog.AddNode(prog.Nodes[1], NodeType.Action);
+            prog.AddNode(prog.Nodes[1], NodeType.SubAI);
             prog.Nodes[0].Command = 0;
             prog.Nodes[1].Command = 777;
             prog.Nodes[2].Command = 7;
@@ -261,17 +232,16 @@ namespace MirAI.DB
             prog.Nodes[2].Y = 300;
             prog.Nodes[3].X = 200;
             prog.Nodes[3].Y = 300;
+            prog.Nodes[0].Save();
+            prog.Nodes[1].Save();
+            prog.Nodes[2].Save();
+            prog.Nodes[3].Save();
             // Установка связей между Нодами
             prog.AddLink(prog.Nodes[0], prog.Nodes[3]);
-            prog.AddLink(prog.Nodes[0], prog.Nodes[1]);
-            prog.AddLink(prog.Nodes[1], prog.Nodes[3]);
-            prog.AddLink(prog.Nodes[1], prog.Nodes[2]);
 
-            prog2.AddNode(NodeType.Root);
-            prog2.AddNode(NodeType.Connector);
-            prog2.AddNode(NodeType.Condition);
-            prog2.AddNode(NodeType.Action);
-            //prog2.AddNode(NodeType.SubAI);
+            prog2.AddNode(prog2.Nodes[0], NodeType.Connector);
+            prog2.AddNode(prog2.Nodes[0], NodeType.Condition);
+            prog2.AddNode(prog2.Nodes[1], NodeType.Action);
             prog2.Nodes[2].Command = 777;
             prog2.Nodes[3].Command = 777;
             prog2.Nodes[0].X = 100;
@@ -282,17 +252,18 @@ namespace MirAI.DB
             prog2.Nodes[2].Y = 100;
             prog2.Nodes[3].X = 200;
             prog2.Nodes[3].Y = 300;
-            prog2.AddLink(prog2.Nodes[0], prog2.Nodes[1]);
-            prog2.AddLink(prog2.Nodes[0], prog2.Nodes[2]);
-            prog2.AddLink(prog2.Nodes[1], prog2.Nodes[3]);
+            prog2.Nodes[0].Save();
+            prog2.Nodes[1].Save();
+            prog2.Nodes[2].Save();
+            prog2.Nodes[3].Save();
             prog2.AddLink(prog2.Nodes[2], prog2.Nodes[3]);
-
 
             prog.Save();
             prog2.Save();
 
             prog.AddLink(prog.Nodes[3], prog2.Nodes[0]);
-            prog.Save();
+            //prog.Save();
+            //prog2.Save();
 
             //prog2.AddLink(prog2.Nodes[3], prog.Nodes[0]);
             //prog2.Save();

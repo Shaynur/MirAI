@@ -119,12 +119,21 @@ namespace MirAI.Forma
             if (moveLink)
             {
                 SetLink(this, e.Location);
+                moveLink = false;
             }
-            moveLink = false;
-            if (!moveUnit)
-                SelectUnit(this, e.Location);
-            moveUnit = false;
-            this.Parent.Refresh();
+            else
+            {
+                if (!moveUnit)
+                    SelectUnit(this, e.Location);
+            }
+
+            if (moveUnit)
+            {
+                refNode.Save();
+                moveUnit = false;
+            }
+            if (Parent != null)
+                Parent.Refresh();
         }
 
         private void UnitUI_MouseMove(object sender, MouseEventArgs e)
@@ -132,9 +141,9 @@ namespace MirAI.Forma
             mouseMovePos = e.Location;
             if (e.Button == MouseButtons.Left)
             {
-                moveUnit = true;
                 if (!moveLink)
                 {
+                    moveUnit = true;
                     Point offset = new Point(e.X - pointUnderUnit.X, e.Y - pointUnderUnit.Y);
                     Mover(this, offset);
                 }
