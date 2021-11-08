@@ -1,14 +1,8 @@
 ﻿using MirAI.AI;
 using MirAI.DB;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace MirAI.Forma
@@ -54,7 +48,6 @@ namespace MirAI.Forma
                 if (curentProgram != null) curentProgram.Save();
                 curentProgram = p;
                 RedrawProgram();
-                Refresh();
             }
         }
         private void RedrawProgram()
@@ -110,7 +103,6 @@ namespace MirAI.Forma
                                          units[selectedUnit].Height + border * 2);
             }
         }
-
 
         private void panel1_MouseDown(object sender, MouseEventArgs e)
         {
