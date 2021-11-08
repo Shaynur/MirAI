@@ -38,7 +38,7 @@ namespace MirAI.Forma
             curentProgram = null;
             listBox1.DataSource = null;
             listBox1.Items.Clear();
-            listBox1.DataSource = MirDBRoutines.GetPrograms(true);
+            listBox1.DataSource = Program.GetListPrograms();
             listBox1.DisplayMember = "Name";
             if (listBox1.Items.Count > 0)
             {

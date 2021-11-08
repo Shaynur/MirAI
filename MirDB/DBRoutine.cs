@@ -23,132 +23,6 @@ namespace MirAI.DB
         }
 
         /// <summary>
-        /// Загрузка списка программ из БД.
-        /// </summary>
-        /// <param name="loadNodes">Загружать содержимое программ (true) или только названия (false)</param>
-        /// <returns>Коллекция программ</returns>
-        public static List<Program> GetPrograms(bool loadNodes)
-        {
-            List<Program> programs;
-            using (MirDBContext db = new MirDBContext())
-            {
-                programs = db.Programs.Include(p => p.Nodes).ThenInclude(n => n.LinkTo).ToList();
-            }
-            return programs;
-        }
-
-        /// <summary>
-        /// Загрузка содержимого программы.
-        /// </summary>
-        /// <param name="programId">Id программы в БД</param>
-        /// <returns>Список всех нодов программы с их связями</returns>
-        public static List<Node> GetNodes(int programId)
-        {
-            List<Node> RetNodes;
-            using (MirDBContext db = new MirDBContext())
-            {
-                RetNodes = db.Nodes.Where(p => p.ProgramId == programId).OrderBy(p => p.Type).Include(n => n.LinkTo).ToList();
-            }
-            return RetNodes;
-        }
-
-        /// <summary>
-        /// Сохранение или обновление юнита
-        /// </summary>
-        /// <param name="unit">Юнит</param>
-        /// <returns>Сохраненный юнит</returns>
-        public static Unit SaveUnit(Unit unit)
-        {
-            using var db = new MirDBContext();
-            if (db.Units.Contains(unit))
-                db.Units.Update(unit);
-            else
-                db.Units.Add(unit);
-            db.SaveChanges();
-            return unit;
-        }
-
-        /// <summary>
-        /// Удаление юнита из БД
-        /// </summary>
-        /// <param name="unit">Удаляемый юнит</param>
-        public static void RemoveUnit(Unit unit)
-        {
-            using MirDBContext db = new MirDBContext();
-            if (db.Units.Contains(unit))
-            {
-                db.Units.Remove(unit);
-                db.SaveChanges();
-            }
-        }
-
-        /// <summary>
-        /// Сохранение программы (без содержимого) в БД
-        /// </summary>
-        /// <param name="program">Программа</param>
-        /// <returns>Программа после сохранения в БД (получает Id если первое сохранение)</returns>
-        public static Program SaveProgramm(Program program)
-        {
-            using MirDBContext db = new MirDBContext();
-            var fromdb = db.Programs.SingleOrDefault(p => p.Id == program.Id);
-            fromdb.Nodes = program.Nodes;
-            db.Programs.Update(fromdb);
-            db.SaveChanges();
-            return program;
-        }
-
-        /// <summary>
-        /// Каскадное удаление программы из БД
-        /// </summary>
-        /// <param name="programm">Программа</param>
-        public static void RemoveProgramm(Program programm)
-        {
-            using MirDBContext db = new MirDBContext();
-            if (db.Programs.Contains(programm))
-            {
-                db.Programs.Remove(programm);
-                db.SaveChanges();
-            }
-        }
-
-        /// <summary>
-        /// Сохранение (или обновление) Нода с его связями в БД
-        /// </summary>
-        /// <param name="node">Нода программы</param>
-        public static void SaveNode(Node node)
-        {
-            using MirDBContext db = new MirDBContext();
-            var nodes = db.Nodes.Where(n => n.Id == node.Id).Include(n => n.LinkTo);
-            foreach (var n in nodes)
-            {
-                if (n.Id == node.Id)
-                {
-                    n.LinkTo = node.LinkTo;
-                    if (db.Nodes.Contains(n))
-                        db.Nodes.Update(n);
-                    else
-                        db.Nodes.Add(n);
-                    db.SaveChanges();
-                    return;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Удаление Ноды из БД
-        /// </summary>
-        /// <param name="node">Нода программы</param>
-        public static void RemoveNode(Node node)
-        {
-            using MirDBContext db = new MirDBContext();
-            if (db.Nodes.Contains(node))
-            {
-                db.Nodes.Remove(node);
-                db.SaveChanges();
-            }
-        }
-
-        /// <summary>
         /// Печать таблиц БД в текстовом виде.
         /// </summary>
         /// <returns>Строка с содержимым БД</returns>
@@ -205,9 +79,7 @@ namespace MirAI.DB
 
         public static void CreateSomeDB()
         {
-            //Console.WriteLine("Очистка БД.");
             MirDBRoutines.Clear();
-            //Console.WriteLine("Генерация новой БД.");
 
             Program prog = new Program("ProgAI");
             Program prog2 = new Program("Sub AI");
@@ -216,7 +88,6 @@ namespace MirAI.DB
             //MirDBRoutines.SaveUnit(unit);
 
             // Добавление Нодов
-            //prog.AddNode(NodeType.Root);
             prog.AddNode(prog.Nodes[0], NodeType.Condition);
             prog.AddNode(prog.Nodes[1], NodeType.Action);
             prog.AddNode(prog.Nodes[1], NodeType.SubAI);
@@ -257,16 +128,11 @@ namespace MirAI.DB
             prog2.Nodes[2].Save();
             prog2.Nodes[3].Save();
             prog2.AddLink(prog2.Nodes[2], prog2.Nodes[3]);
+            prog.AddLink(prog.Nodes[3], prog2.Nodes[0]);
 
             prog.Save();
             prog2.Save();
 
-            prog.AddLink(prog.Nodes[3], prog2.Nodes[0]);
-            //prog.Save();
-            //prog2.Save();
-
-            //prog2.AddLink(prog2.Nodes[3], prog.Nodes[0]);
-            //prog2.Save();
         }
     }
 }

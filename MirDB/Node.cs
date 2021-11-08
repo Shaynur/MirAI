@@ -14,7 +14,7 @@ namespace MirAI.AI
     public delegate bool NodeAIValidator(Node node);
 
     [Table("Nodes")]
-    public class Node : IEquatable<Node>
+    public class Node : IEquatable<Node> , IComparable<Node>
     {
         public int Id { get; set; }
         public int ProgramId { get; set; }
@@ -25,8 +25,6 @@ namespace MirAI.AI
         [NotMapped]
         public bool discovered;
 
-        [NotMapped]
-        //public List<Node> Next { get; set; } = new List<Node>();
         public List<NodeLink> LinkFrom { get; set; } = new List<NodeLink>();
         public List<NodeLink> LinkTo { get; set; } = new List<NodeLink>();
 
@@ -41,7 +39,7 @@ namespace MirAI.AI
 
         public Node Save()
         {
-            MirDBContext db = new MirDBContext();
+            using var db = new MirDBContext();
             Save(db);
             db.SaveChanges();
             return this;
@@ -57,19 +55,15 @@ namespace MirAI.AI
                 fromdb.X = this.X;
                 fromdb.Y = this.Y;
                 fromdb.Command = this.Command;
-//                fromdb.LinkTo = this.LinkTo;
                 foreach (var l in this.LinkTo)
                 {
                     if (!fromdb.LinkTo.Contains(l))
                         fromdb.LinkTo.Add(l);
                 }
-               
                 db.Nodes.Update(fromdb);
             }
             return this;
         }
-
-
 
         public bool AddChildNode(Node node)
         {
@@ -172,6 +166,14 @@ namespace MirAI.AI
         public override int GetHashCode()
         {
             return this.Id.GetHashCode();
+        }
+
+        public int CompareTo([AllowNull] Node other)
+        {
+            if (other is null)
+                return 1;
+            else
+                return this.Type.CompareTo(other.Type);
         }
 
         public static bool operator ==(Node node1, Node node2)

@@ -91,6 +91,21 @@ namespace MirAI.AI
             }
             return false;
         }
+        public static List<Program> GetListPrograms()
+        {
+            List<Program> programs;
+            using var db = new MirDBContext();
+            programs = db.Programs
+                        .Include(p => p.Nodes)
+                        .ThenInclude(n => n.LinkTo)
+                        .ThenInclude(l => l.To)
+                        .ToList();
+            //foreach( var p in programs)   // Сортировка нодов по типу (Node.Type)
+            //{
+            //    p.Nodes.Sort();
+            //}
+            return programs;
+        }
 
         public void Reload()
         {
@@ -127,11 +142,21 @@ namespace MirAI.AI
             return this;
         }
 
+        public static void RemoveProgramm(Program programm)
+        {
+            using var db = new MirDBContext();
+            if (db.Programs.Contains(programm))
+            {
+                db.Programs.Remove(programm);
+                db.SaveChanges();
+            }
+        }
+
         public bool RemoveNode(Node node)
         {
             if (node.Type == NodeType.Root)
                 return false;
-            using MirDBContext db = new MirDBContext();
+            using var db = new MirDBContext();
             var fromdb = db.Nodes.Include(p => p.LinkTo).ThenInclude(u => u.To).SingleOrDefault(p => p.Id == node.Id);
             if (fromdb != null)             // Удаляем ноду из БД
             {
@@ -156,7 +181,7 @@ namespace MirAI.AI
         /// <returns>Первая валидная нода действия или 'null' если такой не существует</returns>
         public Node Run(ref List<Program> programs)
         {
-            Node curnode = Nodes.Find(n => n.Type == NodeType.Root);
+            Node curnode = this.GetRootNode();
             Console.WriteLine($"Run({this.Name})"); ///TODO временно (Run trace)
             if (!(curnode is null))
             {
@@ -213,7 +238,7 @@ namespace MirAI.AI
         /// <returns>true если размер не превышает Program.MaxLenght, false если превышает</returns>
         public bool CheckProgram(ref int lenght, ref List<Program> programs)
         {
-            Node curnode = Nodes.Find(n => n.Type == NodeType.Root);
+            Node curnode = this.GetRootNode();
             if (!(curnode is null))
             {
                 UnDiscover();

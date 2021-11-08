@@ -15,7 +15,7 @@ namespace MirAI
             PrintColor(MirDBRoutines.ToString(), ConsoleColor.Blue);
 
             Console.WriteLine("Загрузка данных из БД в 'List<Program> programs'.");
-            List<Program> programs = MirDBRoutines.GetPrograms(true);
+            List<Program> programs = Program.GetListPrograms();
             Console.WriteLine($"Количество записей в 'programs': {programs.Count}");
             foreach (var p in programs)
             {
