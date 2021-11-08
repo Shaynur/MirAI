@@ -222,11 +222,41 @@ namespace MirAI.Forma
                     return;
                 }
             }
-            var tf = new AddUnitUIForm();
-            tf.ShowDialog(this);
-            if (tf.selectedNodeType != NodeType.None)
+            var addform = new AddUnitUIForm();
+            addform.ShowDialog(this);
+            NodeType newNodeType = addform.selectedNodeType;
+            addform.Dispose();
+            if (newNodeType != NodeType.None)
             {
-                Node node = curentProgram.AddNode(unit.refNode, tf.selectedNodeType);
+                Node node = null;
+                if (addform.selectedNodeType == NodeType.SubAI)
+                {
+                    if (listBox1.Items.Count < 2)
+                    {
+                        MessageBox.Show("Невозможно создать ссылку на подпрограмму т.к. в списке программ всего одна." +
+                            "\n\n(Сначала создайте еще программу, что-бы можно было добавить ее в качестве подпрограммы)",
+                            "", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                    var selpform = new SelectProgram(listBox1.DataSource, curentProgram.Name);
+                    DialogResult dr = selpform.ShowDialog(this);
+                    string subprogname = selpform.selectedProgram;
+                    selpform.Dispose();
+                    if (dr == DialogResult.OK)
+                    {
+                        node = curentProgram.AddNode(unit.refNode, newNodeType);
+                        foreach (Program p in listBox1.Items)
+                        {
+                            if( p.Name == subprogname )
+                            {
+                                node.AddChildNode(p.GetRootNode());
+                            }
+                        }
+                    }
+                    else
+                        return;
+                }
+                //node = curentProgram.AddNode(unit.refNode, newNodeType);
                 panel1.SuspendLayout();
                 node.X = coord.X;
                 node.Y = coord.Y - UnitUI.connectorR;
@@ -236,7 +266,6 @@ namespace MirAI.Forma
                 curentProgram.Reload();
                 RedrawProgram();
             }
-            tf.Dispose();
         }
 
         private void SelectUnit(UnitUI unit, Point offset)

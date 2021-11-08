@@ -61,6 +61,7 @@ namespace MirAI.Forma
             {
                 case NodeType.Root:
                     {
+                        Width = 300; 
                         Height = 60;
                         BackColor = Color.Gray;
                         AddRoundedRectangle(ref gPath, new Rectangle(0, 0, Width, Height - connectorR), 6);
