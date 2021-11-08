@@ -46,11 +46,10 @@ namespace MirAI
             Console.Read();
         }
 
-
         public static bool CheckNode(Node node)
         {
             bool ret = (node.Command == 777);
-            Console.WriteLine($"\tCheckNode({node.Id}.{node.Type}) = {ret}"); //TODO временно (Run trace)
+            Console.WriteLine($"\tCheckNode({node.Id}.{node.Type}) = {ret}");
             return ret;
         }
 

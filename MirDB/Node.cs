@@ -9,7 +9,7 @@ using System.Text;
 
 namespace MirAI.AI
 {
-    public enum NodeType { Root = 0, Action = 1, Condition = 2, Connector = 3, SubAI = 4 }
+    public enum NodeType { None = -1, Root = 0, Action = 1, Condition = 2, Connector = 3, SubAI = 4 }
     // Объявляем делегат
     public delegate bool NodeAIValidator(Node node);
 
@@ -18,6 +18,7 @@ namespace MirAI.AI
     {
         public int Id { get; set; }
         public int ProgramId { get; set; }
+        //public Program Program { get; set; }
         public NodeType Type { get; set; }
         public int Command { get; set; }
         public int X { get; set; }
@@ -31,9 +32,9 @@ namespace MirAI.AI
         public Node()
         {
         }
-        public Node(int program, NodeType type)
+        public Node(int programId, NodeType type)
         {
-            ProgramId = program;
+            ProgramId = programId;
             Type = type;
         }
 

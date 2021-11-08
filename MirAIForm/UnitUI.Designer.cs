@@ -40,7 +40,6 @@ namespace MirAI.Forma
             this.Name = "UnitUI";
             this.Size = new System.Drawing.Size(200, 80);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.UnitUI_Paint);
-            this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.UnitUI_MouseClick);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.UnitUI_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.UnitUI_MouseMove);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.UnitUI_MouseUp);

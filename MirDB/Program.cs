@@ -36,6 +36,38 @@ namespace MirAI.AI
             Save();
         }
 
+        public static List<Program> GetListPrograms()
+        {
+            List<Program> programs;
+            using var db = new MirDBContext();
+            programs = db.Programs
+                        .Include(p => p.Nodes)
+                        .ThenInclude(n => n.LinkTo)
+                        .ThenInclude(l => l.To)
+                        .ToList();
+            //foreach( var p in programs)   // Сортировка нодов по типу (Node.Type)
+            //{
+            //    p.Nodes.Sort();
+            //}
+            return programs;
+        }
+
+        public static string GetName(int id)
+        {
+            using var db = new MirDBContext();
+            var fromdb = db.Programs.SingleOrDefault(p => p.Id == id);
+            if (fromdb != null)
+                return fromdb.Name;
+            return null;
+        }
+
+        //public static Program Get(int id)
+        //{
+        //    using var db = new MirDBContext();
+        //    var fromdb = db.Programs.Include(p => p.Nodes).ThenInclude(n => n.LinkTo).ThenInclude(l => l.To).SingleOrDefault(p => p.Id == id);
+        //    return fromdb;
+        //}
+
         public Node GetRootNode()
         {
             return Nodes.Find(n => n.Type == NodeType.Root);
@@ -90,21 +122,6 @@ namespace MirAI.AI
                 return owner.AddChildNode(child);
             }
             return false;
-        }
-        public static List<Program> GetListPrograms()
-        {
-            List<Program> programs;
-            using var db = new MirDBContext();
-            programs = db.Programs
-                        .Include(p => p.Nodes)
-                        .ThenInclude(n => n.LinkTo)
-                        .ThenInclude(l => l.To)
-                        .ToList();
-            //foreach( var p in programs)   // Сортировка нодов по типу (Node.Type)
-            //{
-            //    p.Nodes.Sort();
-            //}
-            return programs;
         }
 
         public void Reload()
@@ -288,7 +305,7 @@ namespace MirAI.AI
         /// </summary>
         /// <param name="fromNode">Нода с которой начинать перечисление вглубь включая ее саму</param>
         /// <returns>Последовательность нод</returns>
-        public IEnumerable<Node> DFC(Node fromNode)
+        public static IEnumerable<Node> DFC(Node fromNode)
         {
             if (!fromNode.discovered)
                 yield return fromNode;

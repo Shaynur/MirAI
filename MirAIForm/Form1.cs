@@ -20,7 +20,6 @@ namespace MirAI.Forma
         private static Pen linkPen = new Pen(UnitUI.linkColor, 5);
         private static Pen selectPen = new Pen(Color.Red, 3);
         private Point mousePressedPos;
-        //private Point mouseMovePos;
         private Point oldPanelPos;
         private int selectedUnit;
 
@@ -55,6 +54,7 @@ namespace MirAI.Forma
                 if (curentProgram != null) curentProgram.Save();
                 curentProgram = p;
                 RedrawProgram();
+                Refresh();
             }
         }
         private void RedrawProgram()
@@ -75,9 +75,9 @@ namespace MirAI.Forma
             int ucount = units.Count + 1;
             UnitUI unit = new UnitUI
             {
-                Location = new Point(node.X, node.Y),
                 refNode = node,
-                Name = "UnitUI" + ucount.ToString()
+                Name = "UnitUI" + ucount.ToString(),
+                program = curentProgram
             };
             units.Add(unit);
             panel1.Controls.Add(unit);
@@ -147,7 +147,7 @@ namespace MirAI.Forma
                 foreach (var fromUnit in units)
                 {
                     Node fromNode = fromUnit.refNode;
-                    if (fromNode != null /*&& fromNode.LinkTo != null*/ && fromNode.LinkTo.Count > 0)
+                    if (fromNode != null && fromNode.LinkTo.Count > 0)
                     {
                         PointF from = new PointF(fromUnit.Left + fromUnit.Width / 2, fromUnit.Top + fromUnit.Height - UnitUI.connectorR);
                         foreach (var nodeLink in fromNode.LinkTo)
@@ -180,9 +180,11 @@ namespace MirAI.Forma
         //---------------------------------------------------------
         private void UnitMover(UnitUI unit, Point offset)
         {
+            if (unit.Parent != this.panel1)
+                return;
             Node startNode = unit.refNode;
             curentProgram.UnDiscover();
-            foreach (var node in curentProgram.DFC(startNode))
+            foreach (var node in Program.DFC(startNode))
             {
                 UnitUI nextUnit = units.Find(u => u.refNode == node);
                 int newLeft = nextUnit.Left + offset.X;
@@ -193,13 +195,15 @@ namespace MirAI.Forma
                     node.discovered = true;
             }
             curentProgram.UnDiscover();
-            foreach (var node in curentProgram.DFC(startNode))
+            foreach (var node in Program.DFC(startNode))
             {
                 UnitUI nextUnit = units.Find(u => u.refNode == node);
                 int newLeft = nextUnit.Left + offset.X;
                 int newTop = nextUnit.Top + offset.Y;
-                nextUnit.refNode.X = nextUnit.Left = newLeft;
-                nextUnit.refNode.Y = nextUnit.Top = newTop;
+                nextUnit.Left = newLeft;
+                nextUnit.Top = newTop;
+                nextUnit.refNode.X = nextUnit.Left + nextUnit.Width / 2;
+                nextUnit.refNode.Y = nextUnit.Top;
                 if (node.Type == NodeType.SubAI)
                     node.discovered = true;
             }
@@ -226,18 +230,21 @@ namespace MirAI.Forma
                     return;
                 }
             }
-            Node node = curentProgram.AddNode(unit.refNode, NodeType.Action); //TODO Диалог создания нового нода
-            panel1.SuspendLayout();
-            node.X = coord.X;
-            node.Y = coord.Y - UnitUI.connectorR;
-            UnitUI newUnit = AddUnit(node);
-            newUnit.Left = coord.X - newUnit.Width / 2;
-            panel1.ResumeLayout(false);
-            node.X = newUnit.Left;
-            node.Save();
-            //Form1_Load(this, null);
-            curentProgram.Reload();
-            RedrawProgram();
+            var tf = new AddUnitUIForm();
+            tf.ShowDialog(this);
+            if (tf.selectedNodeType != NodeType.None)
+            {
+                Node node = curentProgram.AddNode(unit.refNode, tf.selectedNodeType);
+                panel1.SuspendLayout();
+                node.X = coord.X;
+                node.Y = coord.Y - UnitUI.connectorR;
+                UnitUI newUnit = AddUnit(node);
+                panel1.ResumeLayout(false);
+                node.Save();
+                curentProgram.Reload();
+                RedrawProgram();
+            }
+            tf.Dispose();
         }
 
         private void SelectUnit(UnitUI unit, Point offset)
@@ -259,7 +266,6 @@ namespace MirAI.Forma
                     return;
                 panel1.Controls.Remove(units[selectedUnit]);
                 units.RemoveAt(selectedUnit);
-                //Form1_Load(this, e);
                 curentProgram.Reload();
                 RedrawProgram();
             }

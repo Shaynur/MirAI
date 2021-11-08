@@ -31,12 +31,10 @@ namespace MirAI.Forma
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.panel1 = new System.Windows.Forms.Panel();
-            this.unitui2 = new MirAI.Forma.UnitUI();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.label1 = new System.Windows.Forms.ToolStripLabel();
-            this.panel1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -45,26 +43,15 @@ namespace MirAI.Forma
             this.panel1.AutoScroll = true;
             this.panel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(50)))));
-            this.panel1.Controls.Add(this.unitui2);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(162, 25);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(569, 551);
+            this.panel1.Size = new System.Drawing.Size(788, 551);
             this.panel1.TabIndex = 1;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             this.panel1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseDown);
             this.panel1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseMove);
             this.panel1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseUp);
-            // 
-            // unitui2
-            // 
-            this.unitui2.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.unitui2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.unitui2.Location = new System.Drawing.Point(147, 24);
-            this.unitui2.Name = "unitui2";
-            this.unitui2.refNode = null;
-            this.unitui2.Size = new System.Drawing.Size(197, 78);
-            this.unitui2.TabIndex = 1;
             // 
             // listBox1
             // 
@@ -87,7 +74,7 @@ namespace MirAI.Forma
             this.label1});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(731, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(950, 25);
             this.toolStrip1.TabIndex = 2;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -111,7 +98,7 @@ namespace MirAI.Forma
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(731, 576);
+            this.ClientSize = new System.Drawing.Size(950, 576);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.listBox1);
             this.Controls.Add(this.toolStrip1);
@@ -120,7 +107,6 @@ namespace MirAI.Forma
             this.Text = "MirAI";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyUp);
-            this.panel1.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -133,8 +119,7 @@ namespace MirAI.Forma
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.ToolStrip toolStrip1;
-        public System.Windows.Forms.ToolStripButton toolStripButton1;
-        private UnitUI unitui2;
+        private System.Windows.Forms.ToolStripButton toolStripButton1;
         private System.Windows.Forms.ToolStripLabel label1;
     }
 }

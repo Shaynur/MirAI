@@ -20,6 +20,7 @@ namespace MirAI.Forma
         private static Pen linkPen = new Pen(linkColor, 4);
         private static SolidBrush linkBrush = new SolidBrush(linkColor);
         public static int connectorR = 8;
+        public Program program;
         private Point pointUnderUnit;
         public Point mouseMovePos;
         private Node _refNode;
@@ -35,7 +36,16 @@ namespace MirAI.Forma
                 if (_refNode != null)
                 {
                     SetRegion();
+                    ReLocation();
                 }
+            }
+        }
+
+        public void ReLocation()
+        {
+            if (_refNode != null)
+            {
+                Location = new Point(_refNode.X - Width / 2, _refNode.Y);
             }
         }
 
@@ -54,7 +64,6 @@ namespace MirAI.Forma
                         Height = 60;
                         BackColor = Color.Gray;
                         AddRoundedRectangle(ref gPath, new Rectangle(0, 0, Width, Height - connectorR), 6);
-                        //AddRoundedRectangle(ref gPath, new Rectangle(0, 0 + connectorR, Width, Height - connectorR * 2), 6);
                         break;
                     }
                 case NodeType.Action:
@@ -62,7 +71,6 @@ namespace MirAI.Forma
                         Width = 160;
                         Height = 100;
                         AddRoundedRectangle(ref gPath, new Rectangle(0, connectorR, Width, Height - connectorR), 4);
-                        //AddRoundedRectangle(ref gPath, new Rectangle(0, 0 + connectorR, Width, Height - connectorR * 2), 4);
                         BackColor = Color.LemonChiffon;
                         break;
                     }
@@ -87,7 +95,6 @@ namespace MirAI.Forma
                 case NodeType.SubAI:
                     {
                         AddRoundedRectangle(ref gPath, new Rectangle(0, connectorR, Width, Height - connectorR), 4);
-                        //AddRoundedRectangle(ref gPath, new Rectangle(0, 0 + connectorR, Width, Height - connectorR * 2), 4);
                         BackColor = Color.LightGray;
                         break;
                     }
@@ -103,7 +110,7 @@ namespace MirAI.Forma
 
         private void UnitUI_MouseDown(object sender, MouseEventArgs e)
         {
-            if (refNode.Type != NodeType.Action && refNode.Type != NodeType.SubAI) // нельзя тянуть линк от Action и SubAI 
+            if (refNode != null && refNode.Type != NodeType.Action && refNode.Type != NodeType.SubAI) // нельзя тянуть линк от Action и SubAI 
             {
                 Rectangle rect = new Rectangle(Width / 2 - connectorR, Height - connectorR * 2, connectorR * 2, connectorR * 2); // область нижнего коннектора
                 if (rect.Contains(e.Location))  // мышка "ухватила" нижний коннектор
@@ -116,20 +123,28 @@ namespace MirAI.Forma
 
         private void UnitUI_MouseUp(object sender, MouseEventArgs e)
         {
-            if (moveLink)
+            bool inForm1 = ParentForm.GetType().Name == "Form1";
+            if (moveLink && inForm1)
             {
-                SetLink(this, e.Location);
+                SetLink?.Invoke(this, e.Location);
                 moveLink = false;
             }
             else
             {
                 if (!moveUnit)
-                    SelectUnit(this, e.Location);
+                    SelectUnit?.Invoke(this, e.Location);
             }
 
+            if (!inForm1) return;
             if (moveUnit)
             {
-                refNode.Save();
+                program.UnDiscover();
+                foreach (var node in Program.DFC(refNode))
+                {
+                    node.Save();
+                    if (node.Type == NodeType.SubAI)
+                        node.discovered = true;
+                }
                 moveUnit = false;
             }
             if (Parent != null)
@@ -138,6 +153,8 @@ namespace MirAI.Forma
 
         private void UnitUI_MouseMove(object sender, MouseEventArgs e)
         {
+            if (ParentForm.GetType().Name != "Form1")
+                return;
             mouseMovePos = e.Location;
             if (e.Button == MouseButtons.Left)
             {
@@ -145,7 +162,7 @@ namespace MirAI.Forma
                 {
                     moveUnit = true;
                     Point offset = new Point(e.X - pointUnderUnit.X, e.Y - pointUnderUnit.Y);
-                    Mover(this, offset);
+                    Mover?.Invoke(this, offset);
                 }
                 else
                     this.Parent.Refresh();
@@ -156,9 +173,37 @@ namespace MirAI.Forma
         {
             if (refNode != null)
             {
-                Font drawFont = new Font("Arial", 10);
+                Font drawFont = new Font("Arial", 12);
                 SolidBrush drawBrush = new SolidBrush(Color.Black);
-                e.Graphics.DrawString(refNode.Type.ToString(), drawFont, drawBrush, 10, Height / 3);
+                Rectangle drawRect = this.ClientRectangle;
+                StringFormat drawFormat = new StringFormat();
+                drawFormat.Alignment = StringAlignment.Center;
+                drawFormat.LineAlignment = StringAlignment.Center;
+                string drawText;
+
+                switch (refNode.Type)
+                {
+                    case NodeType.Root:
+                        drawText = Program.GetName(refNode.ProgramId);
+                        break;
+                    case NodeType.Action:
+                    case NodeType.Condition:
+                        drawText = refNode.Command.ToString();
+                        break;
+                    case NodeType.SubAI:
+                        if (refNode.LinkTo.Count > 0) { drawText = Program.GetName(refNode.LinkTo[0].To.ProgramId); }
+                        else { drawText = "?"; }
+                        break;
+                    case NodeType.Connector:
+                        drawText = "";
+                        break;
+                    default:
+                        drawText = "Неизвестный тип";
+                        break;
+                }
+
+                e.Graphics.DrawString(drawText, drawFont, drawBrush, drawRect, drawFormat);
+
                 if (refNode.Type != NodeType.Root)
                 {
                     e.Graphics.DrawEllipse(linkPen, Width / 2 - connectorR + 1, 0 + 1, connectorR * 2 - 4, connectorR * 2 - 5);
@@ -179,10 +224,6 @@ namespace MirAI.Forma
             path.AddRectangle(new Rectangle(r.Left + radius, r.Top, r.Width - d, r.Height));
             path.AddRectangle(new Rectangle(r.Left, r.Top + radius, r.Width, r.Height - d));
             path.CloseFigure();
-        }
-
-        private void UnitUI_MouseClick(object sender, MouseEventArgs e)
-        {
         }
     }
 }
