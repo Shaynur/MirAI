@@ -37,8 +37,8 @@ namespace MirAI.Forma
             this.MenuItemAddProg = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemDelProg = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
-            this.label1 = new System.Windows.Forms.ToolStripLabel();
+            this.btnAddProg = new System.Windows.Forms.ToolStripButton();
+            this.btnDelProg = new System.Windows.Forms.ToolStripButton();
             this.itemBoxMenu.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -80,48 +80,54 @@ namespace MirAI.Forma
             this.MenuItemDelProg});
             this.itemBoxMenu.Name = "itemBoxMenu";
             this.itemBoxMenu.ShowImageMargin = false;
-            this.itemBoxMenu.Size = new System.Drawing.Size(156, 70);
+            this.itemBoxMenu.Size = new System.Drawing.Size(94, 48);
             // 
             // MenuItemAddProg
             // 
             this.MenuItemAddProg.Name = "MenuItemAddProg";
-            this.MenuItemAddProg.Size = new System.Drawing.Size(155, 22);
+            this.MenuItemAddProg.Size = new System.Drawing.Size(93, 22);
             this.MenuItemAddProg.Text = "Новая...";
             this.MenuItemAddProg.Click += new System.EventHandler(this.MenuItemAddProg_Click);
             // 
             // MenuItemDelProg
             // 
             this.MenuItemDelProg.Name = "MenuItemDelProg";
-            this.MenuItemDelProg.Size = new System.Drawing.Size(155, 22);
+            this.MenuItemDelProg.Size = new System.Drawing.Size(93, 22);
             this.MenuItemDelProg.Text = "Удалить";
             this.MenuItemDelProg.Click += new System.EventHandler(this.MenuItemDelProg_Click);
             // 
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripButton1,
-            this.label1});
+            this.btnAddProg,
+            this.btnDelProg});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(950, 25);
             this.toolStrip1.TabIndex = 2;
             this.toolStrip1.Text = "toolStrip1";
             // 
-            // toolStripButton1
+            // btnAddProg
             // 
-            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
-            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
-            this.toolStripButton1.Text = "toolStripButton1";
-            this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
+            this.btnAddProg.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnAddProg.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnAddProg.Image = ((System.Drawing.Image)(resources.GetObject("btnAddProg.Image")));
+            this.btnAddProg.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnAddProg.Name = "btnAddProg";
+            this.btnAddProg.Size = new System.Drawing.Size(129, 22);
+            this.btnAddProg.Text = "Добавить программу";
+            this.btnAddProg.Click += new System.EventHandler(this.MenuItemAddProg_Click);
             // 
-            // label1
+            // btnDelProg
             // 
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(86, 22);
-            this.label1.Text = "toolStripLabel1";
+            this.btnDelProg.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.btnDelProg.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnDelProg.Image = ((System.Drawing.Image)(resources.GetObject("btnDelProg.Image")));
+            this.btnDelProg.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnDelProg.Name = "btnDelProg";
+            this.btnDelProg.Size = new System.Drawing.Size(121, 22);
+            this.btnDelProg.Text = "Удалить программу";
+            this.btnDelProg.Click += new System.EventHandler(this.MenuItemDelProg_Click);
             // 
             // Form1
             // 
@@ -149,11 +155,11 @@ namespace MirAI.Forma
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private System.Windows.Forms.ToolStripButton toolStripButton1;
-        private System.Windows.Forms.ToolStripLabel label1;
         private System.Windows.Forms.ContextMenuStrip itemBoxMenu;
         private System.Windows.Forms.ToolStripMenuItem MenuItemAddProg;
         private System.Windows.Forms.ToolStripMenuItem MenuItemDelProg;
+        private System.Windows.Forms.ToolStripButton btnAddProg;
+        private System.Windows.Forms.ToolStripButton btnDelProg;
     }
 }
 

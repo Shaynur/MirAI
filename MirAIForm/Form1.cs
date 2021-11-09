@@ -36,8 +36,11 @@ namespace MirAI.Forma
             if (listBox1.Items.Count > 0)
             {
                 listBox1.SelectedIndex = listBox1.TopIndex;
-                //listBox1.SetSelected(0, true);
                 curentProgram = listBox1.SelectedItem as Program;
+            }
+            else
+            {
+                RedrawProgram();
             }
         }
 
@@ -51,12 +54,12 @@ namespace MirAI.Forma
                 RedrawProgram();
             }
         }
-        private void RedrawProgram()
+        public void RedrawProgram()
         {
             panel1.SuspendLayout();
             panel1.Controls.Clear();
             units.Clear();
-            for (int i = 0; i < curentProgram.Nodes.Count; i++)
+            for (int i = 0; i < (curentProgram?.Nodes.Count ?? 0); i++)
             {
                 AddUnit(curentProgram.Nodes[i]);
             }
@@ -229,23 +232,12 @@ namespace MirAI.Forma
             addform.Dispose();
             if (newNodeType != NodeType.None)
             {
-                string subprogname = "";
+                Program subprog = null;
                 int command = 0;
                 switch (newNodeType)
                 {
                     case NodeType.SubAI:
-                        if (listBox1.Items.Count < 2)
-                        {
-                            MessageBox.Show("Невозможно создать ссылку на подпрограмму т.к. в списке программ всего одна." +
-                                "\n\n(Сначала создайте еще программу, что-бы можно было добавить ее в качестве подпрограммы)",
-                                "", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            return;
-                        }
-                        var selpform = new SelectProgram(listBox1.DataSource, curentProgram.Name);
-                        DialogResult dr = selpform.ShowDialog(this);
-                        subprogname = selpform.selectedProgram;
-                        selpform.Dispose();
-                        if (dr == DialogResult.Cancel)
+                        if (!GetProgramFromList(ref subprog))
                             return;
                         break;
                     case NodeType.Action:
@@ -266,13 +258,7 @@ namespace MirAI.Forma
                 switch (newNodeType)
                 {
                     case NodeType.SubAI:
-                        foreach (Program p in listBox1.Items)
-                        {
-                            if (p.Name == subprogname)
-                            {
-                                node.AddChildNode(p.GetRootNode());
-                            }
-                        }
+                        node.AddChildNode(subprog.GetRootNode());
                         break;
                     case NodeType.Action:
                     case NodeType.Condition:
@@ -292,6 +278,31 @@ namespace MirAI.Forma
             }
         }
 
+        public bool GetProgramFromList(ref Program program)
+        {
+            if (listBox1.Items.Count < 2)
+            {
+                MessageBox.Show("Невозможно создать ссылку на подпрограмму т.к. в списке программ всего одна." +
+                    "\n\n(Сначала создайте еще программу, что-бы можно было добавить ее в качестве подпрограммы)",
+                    "", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+            var selpform = new SelectProgram(listBox1.DataSource, curentProgram.Name);
+            DialogResult dr = selpform.ShowDialog(this);
+            string subprogname = selpform.selectedProgram;
+            selpform.Dispose();
+            if (dr == DialogResult.Cancel)
+                return false;
+            foreach (Program p in listBox1.Items)
+            {
+                if (p.Name == subprogname)
+                {
+                    program = p;
+                    return true;
+                }
+            }
+            return false;
+        }
         private void SelectUnit(UnitUI unit, Point offset)
         {
             int newSel = units.IndexOf(unit);

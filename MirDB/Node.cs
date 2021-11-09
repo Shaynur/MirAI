@@ -78,10 +78,10 @@ namespace MirAI.AI
             //if (dbto == null)
             //    dbto = node.Save(db);
             NodeLink nl = new NodeLink(dbfrom, dbto);
-            if (!LinkTo.Contains(nl))
+            if (!dbfrom.LinkTo.Contains(nl))
             {
-                LinkTo.Add(nl);
                 dbfrom.LinkTo.Add(nl);
+                LinkTo.Add(nl);
             }
             else
                 return false;

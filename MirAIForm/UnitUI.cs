@@ -61,7 +61,7 @@ namespace MirAI.Forma
             {
                 case NodeType.Root:
                     {
-                        Width = 300; 
+                        Width = 300;
                         Height = 60;
                         BackColor = Color.Gray;
                         AddRoundedRectangle(ref gPath, new Rectangle(0, 0, Width, Height - connectorR), 6);
@@ -225,6 +225,31 @@ namespace MirAI.Forma
             path.AddRectangle(new Rectangle(r.Left + radius, r.Top, r.Width - d, r.Height));
             path.AddRectangle(new Rectangle(r.Left, r.Top + radius, r.Width, r.Height - d));
             path.CloseFigure();
+        }
+
+        private void UnitUI_DoubleClick(object sender, EventArgs e)
+        {
+            switch (refNode.Type)
+            {
+                case NodeType.SubAI:
+                    Program p = null;
+                    if (!((Form1)ParentForm).GetProgramFromList(ref p))
+                        return;
+                    while (refNode.LinkTo.Count > 0)
+                    {
+                        refNode.RemoveChildNode(refNode.LinkTo[0].To);
+                    }
+                    refNode.AddChildNode(p.GetRootNode());
+                    break;
+                case NodeType.Action:
+                    // TODO Редактор команды ноды-действия
+                    break;
+                case NodeType.Condition:
+                    // TODO Редактор команды ноды-условия
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

@@ -36,10 +36,10 @@ namespace MirAI.Forma
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.Name = "UnitUI";
-            this.Size = new System.Drawing.Size(200, 80);
+            this.Size = new System.Drawing.Size(202, 82);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.UnitUI_Paint);
+            this.DoubleClick += new System.EventHandler(this.UnitUI_DoubleClick);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.UnitUI_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.UnitUI_MouseMove);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.UnitUI_MouseUp);
