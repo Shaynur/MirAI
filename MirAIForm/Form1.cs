@@ -355,8 +355,9 @@ namespace MirAI.Forma
             var ibox = new InputBox(progNames);
             if (ibox.ShowDialog(this) == DialogResult.OK)
             {
-                new Program(ibox.textBox1.Text);
+                Program newProg = new Program(ibox.textBox1.Text);
                 Form1_Load(sender, e);
+                listBox1.SelectedIndex = listBox1.FindString(newProg.Name);
             }
             ibox.Dispose();
         }

@@ -193,6 +193,7 @@ namespace MirAI.Forma
                 switch (refNode.Type)
                 {
                     case NodeType.Root:
+                        drawFont = new Font("Arial", 14, FontStyle.Bold);
                         drawText = Program.GetName(refNode.ProgramId);
                         break;
                     case NodeType.Action:
