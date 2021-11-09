@@ -29,12 +29,17 @@ namespace MirAI.Forma
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.panel1 = new System.Windows.Forms.Panel();
             this.listBox1 = new System.Windows.Forms.ListBox();
+            this.itemBoxMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.MenuItemAddProg = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuItemDelProg = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.label1 = new System.Windows.Forms.ToolStripLabel();
+            this.itemBoxMenu.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -44,9 +49,9 @@ namespace MirAI.Forma
             this.panel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(50)))));
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(162, 25);
+            this.panel1.Location = new System.Drawing.Point(163, 25);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(788, 551);
+            this.panel1.Size = new System.Drawing.Size(787, 551);
             this.panel1.TabIndex = 1;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             this.panel1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseDown);
@@ -56,6 +61,7 @@ namespace MirAI.Forma
             // listBox1
             // 
             this.listBox1.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.listBox1.ContextMenuStrip = this.itemBoxMenu;
             this.listBox1.Dock = System.Windows.Forms.DockStyle.Left;
             this.listBox1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.listBox1.FormattingEnabled = true;
@@ -63,9 +69,32 @@ namespace MirAI.Forma
             this.listBox1.ItemHeight = 21;
             this.listBox1.Location = new System.Drawing.Point(0, 25);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(162, 551);
+            this.listBox1.Size = new System.Drawing.Size(163, 551);
             this.listBox1.TabIndex = 0;
             this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
+            // 
+            // itemBoxMenu
+            // 
+            this.itemBoxMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.MenuItemAddProg,
+            this.MenuItemDelProg});
+            this.itemBoxMenu.Name = "itemBoxMenu";
+            this.itemBoxMenu.ShowImageMargin = false;
+            this.itemBoxMenu.Size = new System.Drawing.Size(156, 70);
+            // 
+            // MenuItemAddProg
+            // 
+            this.MenuItemAddProg.Name = "MenuItemAddProg";
+            this.MenuItemAddProg.Size = new System.Drawing.Size(155, 22);
+            this.MenuItemAddProg.Text = "Новая...";
+            this.MenuItemAddProg.Click += new System.EventHandler(this.MenuItemAddProg_Click);
+            // 
+            // MenuItemDelProg
+            // 
+            this.MenuItemDelProg.Name = "MenuItemDelProg";
+            this.MenuItemDelProg.Size = new System.Drawing.Size(155, 22);
+            this.MenuItemDelProg.Text = "Удалить";
+            this.MenuItemDelProg.Click += new System.EventHandler(this.MenuItemDelProg_Click);
             // 
             // toolStrip1
             // 
@@ -107,6 +136,7 @@ namespace MirAI.Forma
             this.Text = "MirAI";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyUp);
+            this.itemBoxMenu.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -121,6 +151,9 @@ namespace MirAI.Forma
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton toolStripButton1;
         private System.Windows.Forms.ToolStripLabel label1;
+        private System.Windows.Forms.ContextMenuStrip itemBoxMenu;
+        private System.Windows.Forms.ToolStripMenuItem MenuItemAddProg;
+        private System.Windows.Forms.ToolStripMenuItem MenuItemDelProg;
     }
 }
 

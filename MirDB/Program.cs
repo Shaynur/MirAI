@@ -32,6 +32,7 @@ namespace MirAI.AI
         {
             Name = name;
             Node node = new Node(this.Id, NodeType.Root);
+            node.X = 350;
             Nodes.Add(node);
             Save();
         }

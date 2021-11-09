@@ -68,6 +68,7 @@ namespace MirAI.Forma
             this.Name = "SelectProgram";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.ResumeLayout(false);
 
         }

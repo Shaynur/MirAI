@@ -35,7 +35,8 @@ namespace MirAI.Forma
             listBox1.DisplayMember = "Name";
             if (listBox1.Items.Count > 0)
             {
-                listBox1.SetSelected(0, true);
+                listBox1.SelectedIndex = listBox1.TopIndex;
+                //listBox1.SetSelected(0, true);
                 curentProgram = listBox1.SelectedItem as Program;
             }
         }
@@ -228,35 +229,58 @@ namespace MirAI.Forma
             addform.Dispose();
             if (newNodeType != NodeType.None)
             {
-                Node node = null;
-                if (addform.selectedNodeType == NodeType.SubAI)
+                string subprogname = "";
+                int command = 0;
+                switch (newNodeType)
                 {
-                    if (listBox1.Items.Count < 2)
-                    {
-                        MessageBox.Show("Невозможно создать ссылку на подпрограмму т.к. в списке программ всего одна." +
-                            "\n\n(Сначала создайте еще программу, что-бы можно было добавить ее в качестве подпрограммы)",
-                            "", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
-                    }
-                    var selpform = new SelectProgram(listBox1.DataSource, curentProgram.Name);
-                    DialogResult dr = selpform.ShowDialog(this);
-                    string subprogname = selpform.selectedProgram;
-                    selpform.Dispose();
-                    if (dr == DialogResult.OK)
-                    {
-                        node = curentProgram.AddNode(unit.refNode, newNodeType);
+                    case NodeType.SubAI:
+                        if (listBox1.Items.Count < 2)
+                        {
+                            MessageBox.Show("Невозможно создать ссылку на подпрограмму т.к. в списке программ всего одна." +
+                                "\n\n(Сначала создайте еще программу, что-бы можно было добавить ее в качестве подпрограммы)",
+                                "", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return;
+                        }
+                        var selpform = new SelectProgram(listBox1.DataSource, curentProgram.Name);
+                        DialogResult dr = selpform.ShowDialog(this);
+                        subprogname = selpform.selectedProgram;
+                        selpform.Dispose();
+                        if (dr == DialogResult.Cancel)
+                            return;
+                        break;
+                    case NodeType.Action:
+                        //TODO Диалог выбора команды для ноды действия
+                        // (возможность отмены и выхода из ф-ии создания ноды)
+                        // command = ??
+                        break;
+                    case NodeType.Condition:
+                        //TODO Диалог выбора команды для ноды действия
+                        // (возможность отмены и выхода из ф-ии создания ноды)
+                        // command = ??
+                        break;
+                    default:
+                        break;
+                }
+
+                Node node = curentProgram.AddNode(unit.refNode, newNodeType);
+                switch (newNodeType)
+                {
+                    case NodeType.SubAI:
                         foreach (Program p in listBox1.Items)
                         {
-                            if( p.Name == subprogname )
+                            if (p.Name == subprogname)
                             {
                                 node.AddChildNode(p.GetRootNode());
                             }
                         }
-                    }
-                    else
-                        return;
+                        break;
+                    case NodeType.Action:
+                    case NodeType.Condition:
+                        node.Command = command;
+                        break;
+                    default:
+                        break;
                 }
-                //node = curentProgram.AddNode(unit.refNode, newNodeType);
                 panel1.SuspendLayout();
                 node.X = coord.X;
                 node.Y = coord.Y - UnitUI.connectorR;
@@ -296,6 +320,37 @@ namespace MirAI.Forma
         {
             MirDBRoutines.CreateSomeDB();
             Form1_Load(sender, e);
+        }
+
+        private void MenuItemDelProg_Click(object sender, EventArgs e)
+        {
+            if (listBox1.SelectedItem != null)
+            {
+                Program p = listBox1.SelectedItem as Program;
+                if (MessageBox.Show("Удалить программу " + p.Name + "? ", "Внимание",
+                                    MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.Cancel)
+                    return;
+                Program.RemoveProgramm(p);
+                Form1_Load(sender, e);
+            }
+        }
+
+        private void MenuItemAddProg_Click(object sender, EventArgs e)
+        {
+            List<string> progNames = new List<string>();
+            List<Program> programs = (List<Program>)listBox1.DataSource;
+            foreach (var p in programs)
+            {
+                progNames.Add(p.Name);
+            }
+
+            var ibox = new InputBox(progNames);
+            if (ibox.ShowDialog(this) == DialogResult.OK)
+            {
+                new Program(ibox.textBox1.Text);
+                Form1_Load(sender, e);
+            }
+            ibox.Dispose();
         }
     }
 }
