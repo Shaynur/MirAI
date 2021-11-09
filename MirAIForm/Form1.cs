@@ -20,14 +20,11 @@ namespace MirAI.Forma
         public Form1()
         {
             InitializeComponent();
-            UnitUI.Mover = UnitMover;
-            UnitUI.SetLink = SetLinkTo;
-            UnitUI.SelectUnit = SelectUnit;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            panel1.Controls.Clear();
+            //panel1.Controls.Clear();
             curentProgram = null;
             listBox1.DataSource = null;
             listBox1.Items.Clear();
@@ -174,7 +171,7 @@ namespace MirAI.Forma
         //---------------------------------------------------------
         // Обработчики различных событий вызываемые из UnitUI
         //---------------------------------------------------------
-        private void UnitMover(UnitUI unit, Point offset)
+        public void UnitMover(UnitUI unit, Point offset)
         {
             if (unit.Parent != this.panel1)
                 return;
@@ -206,7 +203,7 @@ namespace MirAI.Forma
             Refresh();
         }
 
-        private void SetLinkTo(UnitUI unit, Point offset)
+        public void SetLinkTo(UnitUI unit, Point offset)
         {
             Point coord = new Point(unit.Left + offset.X, unit.Top + offset.Y);
             foreach (var u in units)
@@ -303,7 +300,7 @@ namespace MirAI.Forma
             }
             return false;
         }
-        private void SelectUnit(UnitUI unit, Point offset)
+        public void SelectUnit(UnitUI unit, Point offset)
         {
             int newSel = units.IndexOf(unit);
             if (selectedUnit == -1 || selectedUnit != newSel)
@@ -362,6 +359,32 @@ namespace MirAI.Forma
                 Form1_Load(sender, e);
             }
             ibox.Dispose();
+        }
+
+        private void MenuItemRename_Click(object sender, EventArgs e)
+        {
+            if (listBox1.SelectedItem != null)
+            {
+                Program selprog = listBox1.SelectedItem as Program;
+
+                List<string> progNames = new List<string>();
+                List<Program> programs = (List<Program>)listBox1.DataSource;
+                foreach (var p in programs)
+                {
+                    if (p.Name != selprog.Name)
+                        progNames.Add(p.Name);
+                }
+
+                var ibox = new InputBox(progNames);
+                ibox.textBox1.Text = selprog.Name;
+                if (ibox.ShowDialog(this) == DialogResult.OK && ibox.textBox1.Text != selprog.Name)
+                {
+                    selprog.Name = ibox.textBox1.Text;
+                    selprog.Save();
+                    Form1_Load(sender, e);
+                }
+                ibox.Dispose();
+            }
         }
     }
 }

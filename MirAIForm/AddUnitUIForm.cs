@@ -38,13 +38,15 @@ namespace MirAI.Forma
                 Math.Max(selunit1.Height, selunit2.Height) + Math.Max(selunit3.Height, selunit4.Height) + lineY1 * 5 + cancelBtn.Height);
             cancelBtn.Top = ClientSize.Height - cancelBtn.Height - lineY1;
             cancelBtn.Left = ClientSize.Width / 2 - cancelBtn.Width / 2;
-            UnitUI.SelectUnit += SelectUnit;
-        }
-        private void SelectUnit(UnitUI unit, Point offset)
-        {
-            selectedNodeType = unit.refNode.Type;
-            this.Close();
         }
 
+        public void AddUnitUIForm_MouseUp(object sender, MouseEventArgs e)
+        {
+            if( sender is UnitUI )
+            {
+                selectedNodeType = ((UnitUI)sender).refNode.Type;
+                this.Close();
+            }
+        }
     }
 }

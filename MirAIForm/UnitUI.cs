@@ -13,9 +13,6 @@ namespace MirAI.Forma
     public partial class UnitUI : UserControl
     {
         public delegate void MoverHandler(UnitUI unit, Point offset);
-        public static MoverHandler Mover;
-        public static MoverHandler SetLink;
-        public static MoverHandler SelectUnit;
         public static Color linkColor = Color.LightGray;
         private static Pen linkPen = new Pen(linkColor, 4);
         private static SolidBrush linkBrush = new SolidBrush(linkColor);
@@ -127,13 +124,24 @@ namespace MirAI.Forma
             bool inForm1 = ParentForm.GetType().Name == "Form1";
             if (moveLink && inForm1)
             {
-                SetLink?.Invoke(this, e.Location);
+                ((Form1)ParentForm).SetLinkTo(this, e.Location);
                 moveLink = false;
             }
             else
             {
                 if (!moveUnit)
-                    SelectUnit?.Invoke(this, e.Location);
+                {
+                    //if (this.ParentForm.GetType().ToString().Contains("Form1"))
+                    if (this.ParentForm is Form1)
+                    {
+                        ((Form1)ParentForm).SelectUnit(this, e.Location);
+                    }
+                    //else if (this.ParentForm.GetType().ToString().Contains("AddUnitUIForm"))
+                    else if (this.ParentForm is AddUnitUIForm)
+                    {
+                        ((AddUnitUIForm)ParentForm).AddUnitUIForm_MouseUp(this, e);
+                    }
+                }
             }
 
             if (!inForm1) return;
@@ -163,7 +171,7 @@ namespace MirAI.Forma
                 {
                     moveUnit = true;
                     Point offset = new Point(e.X - pointUnderUnit.X, e.Y - pointUnderUnit.Y);
-                    Mover?.Invoke(this, offset);
+                    ((Form1)ParentForm).UnitMover(this, offset);
                 }
                 else
                     this.Parent.Refresh();

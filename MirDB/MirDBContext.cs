@@ -35,7 +35,6 @@ namespace MirAI.DB
                 .WithMany(n => n.LinkFrom)
                 .HasForeignKey(n => n.ToId);
 
-            modelBuilder.Entity<Program>().HasAlternateKey(p => p.Name);
             modelBuilder.Entity<Program>().Property(n => n.Name).HasColumnType("varchar(30)");
         }
     }

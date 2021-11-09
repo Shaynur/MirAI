@@ -39,6 +39,7 @@ namespace MirAI.Forma
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.btnAddProg = new System.Windows.Forms.ToolStripButton();
             this.btnDelProg = new System.Windows.Forms.ToolStripButton();
+            this.MenuItemRename = new System.Windows.Forms.ToolStripMenuItem();
             this.itemBoxMenu.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -70,6 +71,7 @@ namespace MirAI.Forma
             this.listBox1.Location = new System.Drawing.Point(0, 25);
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(163, 551);
+            this.listBox1.Sorted = true;
             this.listBox1.TabIndex = 0;
             this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
             // 
@@ -77,22 +79,23 @@ namespace MirAI.Forma
             // 
             this.itemBoxMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.MenuItemAddProg,
+            this.MenuItemRename,
             this.MenuItemDelProg});
             this.itemBoxMenu.Name = "itemBoxMenu";
             this.itemBoxMenu.ShowImageMargin = false;
-            this.itemBoxMenu.Size = new System.Drawing.Size(94, 48);
+            this.itemBoxMenu.Size = new System.Drawing.Size(156, 92);
             // 
             // MenuItemAddProg
             // 
             this.MenuItemAddProg.Name = "MenuItemAddProg";
-            this.MenuItemAddProg.Size = new System.Drawing.Size(93, 22);
+            this.MenuItemAddProg.Size = new System.Drawing.Size(155, 22);
             this.MenuItemAddProg.Text = "Новая...";
             this.MenuItemAddProg.Click += new System.EventHandler(this.MenuItemAddProg_Click);
             // 
             // MenuItemDelProg
             // 
             this.MenuItemDelProg.Name = "MenuItemDelProg";
-            this.MenuItemDelProg.Size = new System.Drawing.Size(93, 22);
+            this.MenuItemDelProg.Size = new System.Drawing.Size(155, 22);
             this.MenuItemDelProg.Text = "Удалить";
             this.MenuItemDelProg.Click += new System.EventHandler(this.MenuItemDelProg_Click);
             // 
@@ -129,6 +132,13 @@ namespace MirAI.Forma
             this.btnDelProg.Text = "Удалить программу";
             this.btnDelProg.Click += new System.EventHandler(this.MenuItemDelProg_Click);
             // 
+            // MenuItemRename
+            // 
+            this.MenuItemRename.Name = "MenuItemRename";
+            this.MenuItemRename.Size = new System.Drawing.Size(155, 22);
+            this.MenuItemRename.Text = "Переименовать";
+            this.MenuItemRename.Click += new System.EventHandler(this.MenuItemRename_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -160,6 +170,7 @@ namespace MirAI.Forma
         private System.Windows.Forms.ToolStripMenuItem MenuItemDelProg;
         private System.Windows.Forms.ToolStripButton btnAddProg;
         private System.Windows.Forms.ToolStripButton btnDelProg;
+        private System.Windows.Forms.ToolStripMenuItem MenuItemRename;
     }
 }
 

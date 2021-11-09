@@ -103,6 +103,7 @@ namespace MirAI.Forma
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Load += new System.EventHandler(this.AddUnitUIForm_Load);
+            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.AddUnitUIForm_MouseUp);
             this.ResumeLayout(false);
 
         }
