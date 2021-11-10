@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using MirAI.AI;
+﻿using MirAI.AI;
 using MirAI.DB;
+using System;
+using System.Collections.Generic;
 
 
 namespace MirAI

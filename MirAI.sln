@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MirDB", "MirDB\MirDB.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MirAIConsole", "MirAIConsole\MirAIConsole.csproj", "{C316F7B5-619D-49B5-91FF-D2C57D42AD1E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MirAIForm", "MirAIForm\MirAIForm.csproj", "{A2ABE526-1043-4EE9-834E-4716295D5BFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MirAIForm", "MirAIForm\MirAIForm.csproj", "{A2ABE526-1043-4EE9-834E-4716295D5BFC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MirAI.AI;
+using System;
+using System.IO;
 
 namespace MirAI.DB
 {
@@ -16,7 +18,8 @@ namespace MirAI.DB
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite(@"data source=D:\Projects\MirAI\DB\MirAI.db");
+            string datasource = GetFullPathDBFile("MirAI.db");
+            optionsBuilder.UseSqlite(@"data source=" + datasource);
             //optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
         }
 
@@ -34,6 +37,19 @@ namespace MirAI.DB
                 .HasForeignKey(n => n.ToId);
 
             modelBuilder.Entity<Program>().Property(n => n.Name).HasColumnType("varchar(30)");
+        }
+
+        public string GetFullPathDBFile(string fileName)
+        {
+#if DEBUG
+            // Этот путь должен быть на ДЕБАГЕ:
+            string datasource = @"D:\Projects\MirAI\DB";
+#else
+            // Этот путь должен быть на РЕЛИЗЕ:
+            string datasource = Path.Combine(Directory.GetCurrentDirectory(), "DB");
+#endif
+            Directory.CreateDirectory(datasource);
+            return Path.Combine(datasource, fileName);
         }
     }
 }
