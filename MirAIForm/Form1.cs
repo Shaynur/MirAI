@@ -24,7 +24,6 @@ namespace MirAI.Forma
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //panel1.Controls.Clear();
             curentProgram = null;
             listBox1.DataSource = null;
             listBox1.Items.Clear();
@@ -39,6 +38,7 @@ namespace MirAI.Forma
             {
                 RedrawProgram();
             }
+
         }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -382,7 +382,9 @@ namespace MirAI.Forma
                 {
                     selprog.Name = ibox.textBox1.Text;
                     selprog.Save();
-                    Form1_Load(sender, e);
+                    listBox1.DisplayMember = "";
+                    listBox1.DisplayMember = "Name";
+                    listBox1.SelectedIndex = listBox1.FindString(selprog.Name);
                 }
                 ibox.Dispose();
             }

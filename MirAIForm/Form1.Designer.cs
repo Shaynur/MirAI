@@ -39,6 +39,7 @@ namespace MirAI.Forma
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.btnAddProg = new System.Windows.Forms.ToolStripButton();
+            this.btnEditName = new System.Windows.Forms.ToolStripButton();
             this.btnDelProg = new System.Windows.Forms.ToolStripButton();
             this.itemBoxMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -142,6 +143,7 @@ namespace MirAI.Forma
             this.toolStrip1.BackColor = System.Drawing.SystemColors.Control;
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.btnAddProg,
+            this.btnEditName,
             this.btnDelProg});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
@@ -159,6 +161,16 @@ namespace MirAI.Forma
             this.btnAddProg.Size = new System.Drawing.Size(23, 22);
             this.btnAddProg.Text = "Добавить программу";
             this.btnAddProg.Click += new System.EventHandler(this.MenuItemAddProg_Click);
+            // 
+            // btnEditName
+            // 
+            this.btnEditName.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnEditName.Image = global::MirAIForm.Properties.Resources.EditName;
+            this.btnEditName.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnEditName.Name = "btnEditName";
+            this.btnEditName.Size = new System.Drawing.Size(23, 22);
+            this.btnEditName.Text = "toolStripButton1";
+            this.btnEditName.Click += new System.EventHandler(this.MenuItemRename_Click);
             // 
             // btnDelProg
             // 
@@ -206,6 +218,7 @@ namespace MirAI.Forma
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton btnAddProg;
         private System.Windows.Forms.ToolStripButton btnDelProg;
+        private System.Windows.Forms.ToolStripButton btnEditName;
     }
 }
 
