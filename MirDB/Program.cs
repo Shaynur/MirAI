@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections;
+﻿using Microsoft.EntityFrameworkCore;
+using MirAI.DB;
+using ServiceStack.DataAnnotations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using MirAI.DB;
-using ServiceStack.DataAnnotations;
 
 namespace MirAI.AI
 {
@@ -21,6 +20,7 @@ namespace MirAI.AI
         public int Id { get; set; }
         [Unique, Column(TypeName = "varchar(30)")]
         public string Name { get; set; }
+        //[NotMapped] //???
         public List<Node> Nodes { get; set; } = new List<Node>();
         /// <summary>
         /// Максимальная длинна программы ( учитываются только ноды действия и ноды условий.
@@ -39,9 +39,8 @@ namespace MirAI.AI
 
         public static List<Program> GetListPrograms()
         {
-            List<Program> programs;
             using var db = new MirDBContext();
-            programs = db.Programs
+            List<Program> programs = db.Programs
                         .Include(p => p.Nodes)
                         .ThenInclude(n => n.LinkTo)
                         .ThenInclude(l => l.To)
@@ -61,13 +60,6 @@ namespace MirAI.AI
                 return fromdb.Name;
             return null;
         }
-
-        //public static Program Get(int id)
-        //{
-        //    using var db = new MirDBContext();
-        //    var fromdb = db.Programs.Include(p => p.Nodes).ThenInclude(n => n.LinkTo).ThenInclude(l => l.To).SingleOrDefault(p => p.Id == id);
-        //    return fromdb;
-        //}
 
         public Node GetRootNode()
         {
@@ -91,23 +83,6 @@ namespace MirAI.AI
         }
 
         /// <summary>
-        /// Добавление существующего нода в программу и привязка его к родительскому
-        /// </summary>
-        /// <param name="ownerNode">Родительский нод</param>
-        /// <param name="child">Добавляемый нод</param>
-        /// <returns></returns>
-        public bool AddNode(Node ownerNode, Node child)
-        {
-            Nodes.Add(child);
-            if (!AddLink(ownerNode, child))
-            {
-                Nodes.Remove(child);
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
         /// Установка связи между двумя нодами программы
         /// </summary>
         /// <param name="owner">Родительский нод</param>
@@ -115,10 +90,10 @@ namespace MirAI.AI
         /// <returns>true если связь была установленна, false если связь невозможна</returns>
         public bool AddLink(Node owner, Node child)
         {
-            if (!(owner is null) && !(child is null) && Nodes.Contains(owner) &&
-                owner.Type != NodeType.Action &&
-                ((owner.Type != NodeType.SubAI && Nodes.Contains(child)) ||
-                 (owner.Type == NodeType.SubAI && !Nodes.Contains(child) && child.Type == NodeType.Root && owner.LinkTo.Count == 0)))
+            if (!(owner is null) && !(child is null) && Nodes.Contains(owner) &&    // Если родитель есть в программе
+                owner.Type != NodeType.Action &&                                    // и родитель не действие
+                ((owner.Type != NodeType.SubAI && Nodes.Contains(child)) ||         // и родитель не ПП и при этом чайлд есть в программе
+                 (owner.Type == NodeType.SubAI && !Nodes.Contains(child) && child.Type == NodeType.Root && owner.LinkTo.Count == 0))) // еще проверки если родитель ПП
             {
                 return owner.AddChildNode(child);
             }
@@ -127,15 +102,18 @@ namespace MirAI.AI
 
         public void Reload()
         {
-            using MirDBContext db = new MirDBContext();
+            using var db = new MirDBContext();
             var fromdb = db.Programs.Include(p => p.Nodes).ThenInclude(n => n.LinkTo).ThenInclude(l => l.To).SingleOrDefault(p => p.Id == this.Id);
             if (fromdb != null)
+            {
+                this.Name = fromdb.Name;
                 this.Nodes = fromdb.Nodes;
+            }
         }
 
         public Program Save()
         {
-            using MirDBContext db = new MirDBContext();
+            using var db = new MirDBContext();
             Save(db);
             db.SaveChanges();
             return this;
@@ -156,7 +134,6 @@ namespace MirAI.AI
             {
                 n.Save(db);
             }
-
             return this;
         }
 
@@ -181,10 +158,9 @@ namespace MirAI.AI
                 db.Nodes.Remove(fromdb);
                 db.SaveChanges();
                 Nodes.Remove(node);             // Удаляем из локальной 'Program'
+                return true;
             }
-            else
-                return false;
-            return true;
+            return false;
         }
 
         /// <summary>
@@ -199,8 +175,8 @@ namespace MirAI.AI
         /// <returns>Первая валидная нода действия или 'null' если такой не существует</returns>
         public Node Run(ref List<Program> programs)
         {
-            Node curnode = this.GetRootNode();
             Console.WriteLine($"Run({this.Name})"); ///TODO временно (Run trace)
+            Node curnode = this.GetRootNode();
             if (!(curnode is null))
             {
                 UnDiscover();
@@ -231,8 +207,7 @@ namespace MirAI.AI
                                 node.discovered = true;
                                 if (node.LinkTo.Count > 0)
                                 {
-                                    Program nextprog = programs.Find(p => p.Id == node.LinkTo[0].To.ProgramId);
-                                    Node rn = nextprog.Run(ref programs);
+                                    Node rn = programs.Find(p => p.Id == node.LinkTo[0].To.ProgramId).Run(ref programs);
                                     if (rn != null)
                                         return rn;
                                 }

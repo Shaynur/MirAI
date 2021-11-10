@@ -109,14 +109,14 @@ namespace MirAI.Forma
         {
             mousePressedPos = e.Location;
             oldPanelPos = new Point(-panel1.AutoScrollPosition.X, -panel1.AutoScrollPosition.Y);
-            foreach (var line in GetLinks())
+            foreach (var line in GetLinks())        // ишем не нажали ли мы на линк, чтобы удалить его
             {
-                float linkSize = LineLenght(line.from, line.to);
-                float mouseSize = LineLenght(line.from, e.Location) + LineLenght(line.to, e.Location);
+                float linkSize = LineLenght(line.from, line.to);  // методом сравнения длинны линка с суммой длинн растояний
+                float mouseSize = LineLenght(line.from, e.Location) + LineLenght(line.to, e.Location);  // от концов до мышки
                 if (mouseSize - linkSize < 0.2)
                 {
                     line.fromNode.RemoveChildNode(line.toNode);
-                    curentProgram.Save();
+                    //curentProgram.Save();
                     Refresh();
                     break;
                 }

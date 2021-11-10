@@ -35,7 +35,6 @@ namespace MirAI.AI
         {
             if (obj == null)
                 return false;
-
             NodeLink NodeLinkObj = obj as NodeLink;
             if (NodeLinkObj == null)
                 return false;
@@ -51,7 +50,6 @@ namespace MirAI.AI
         {
             if (((object)NodeLink1) == null || ((object)NodeLink2) == null)
                 return Object.Equals(NodeLink1, NodeLink2);
-
             return NodeLink1.Equals(NodeLink2);
         }
 
@@ -59,7 +57,6 @@ namespace MirAI.AI
         {
             if (((object)NodeLink1) == null || ((object)NodeLink2) == null)
                 return !Object.Equals(NodeLink1, NodeLink2);
-
             return !(NodeLink1.Equals(NodeLink2));
         }
 

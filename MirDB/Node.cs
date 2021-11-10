@@ -10,28 +10,25 @@ using System.Text;
 namespace MirAI.AI
 {
     public enum NodeType { None = -1, Root = 0, Action = 1, Condition = 2, Connector = 3, SubAI = 4 }
-    // Объявляем делегат
+    // Объявляем делегат для обработчика внешней проверки условия в ноде на валидность
     public delegate bool NodeAIValidator(Node node);
 
     [Table("Nodes")]
-    public class Node : IEquatable<Node> , IComparable<Node>
+    public class Node : IEquatable<Node>, IComparable<Node>
     {
         public int Id { get; set; }
         public int ProgramId { get; set; }
-        //public Program Program { get; set; }
         public NodeType Type { get; set; }
         public int Command { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
-        [NotMapped]
-        public bool discovered;
-
         public List<NodeLink> LinkFrom { get; set; } = new List<NodeLink>();
         public List<NodeLink> LinkTo { get; set; } = new List<NodeLink>();
 
-        public Node()
-        {
-        }
+        [NotMapped]
+        public bool discovered;
+
+        public Node() { }
         public Node(int programId, NodeType type)
         {
             ProgramId = programId;
@@ -44,24 +41,29 @@ namespace MirAI.AI
             Save(db);
             db.SaveChanges();
             return this;
-
         }
         public Node Save(MirDBContext db)
         {
-            if (!db.Nodes.Contains(this))
+            if (!db.Nodes.Contains(this))       // Если ноды нет в БД - добавляем
                 db.Nodes.Add(this);
-            else
+            else                                // иначе - обновляем содержимое
             {
                 var fromdb = db.Nodes.Include(p => p.LinkTo).ThenInclude(u => u.To).SingleOrDefault(p => p.Id == this.Id);
                 fromdb.X = this.X;
                 fromdb.Y = this.Y;
                 fromdb.Command = this.Command;
-                foreach (var l in this.LinkTo)
+                foreach (var l in this.LinkTo)  // добавляем отсутствующие линки
                 {
                     if (!fromdb.LinkTo.Contains(l))
                         fromdb.LinkTo.Add(l);
                 }
+                foreach (var l in fromdb.LinkTo)  // и убираем лишние
+                {
+                    if (!this.LinkTo.Contains(l))
+                        db.Remove(l);
+                }
                 db.Nodes.Update(fromdb);
+                return fromdb;
             }
             return this;
         }
@@ -72,8 +74,6 @@ namespace MirAI.AI
                 return false;
             using var db = new MirDBContext();
             var dbfrom = db.Nodes.Include(p => p.LinkTo).ThenInclude(u => u.To).SingleOrDefault(p => p.Id == this.Id);
-            //if (dbfrom == null)
-            //    dbfrom = this.Save(db);
             var dbto = db.Nodes.Include(p => p.LinkTo).ThenInclude(u => u.To).SingleOrDefault(p => p.Id == node.Id);
             //if (dbto == null)
             //    dbto = node.Save(db);
@@ -82,6 +82,7 @@ namespace MirAI.AI
             {
                 dbfrom.LinkTo.Add(nl);
                 LinkTo.Add(nl);
+                node.LinkFrom.Add(nl);
             }
             else
                 return false;
@@ -97,7 +98,7 @@ namespace MirAI.AI
             if (node.LinkFrom.Contains(nl))
                 node.LinkFrom.Remove(nl);
             using var db = new MirDBContext();
-            var dbfrom = db.Nodes.Include(p => p.LinkTo).ThenInclude(u => u.To).Single(p => p.Id == this.Id);
+            var dbfrom = db.Nodes.Include(p => p.LinkTo).ThenInclude(u => u.To).SingleOrDefault(p => p.Id == this.Id);
             var linktoremove = dbfrom.LinkTo.Find(u => u.To.Id == node.Id);
             db.Remove(linktoremove);
             db.SaveChanges();
@@ -118,11 +119,10 @@ namespace MirAI.AI
             Validator = validator;
         }
         // Метод вызываемый для проверки экземпляра Node на валидность
+        // Если обработчик не привязан, возвращает false
         public bool IsValid()
         {
-            if (Validator != null)
-                return Validator.Invoke(this);
-            return false;
+            return (Validator?.Invoke(this) ?? false);
         }
         //-------------------------------------------------------------------------
         /// <summary>
@@ -156,7 +156,6 @@ namespace MirAI.AI
         {
             if (obj == null)
                 return false;
-
             Node NodeObj = obj as Node;
             if (NodeObj == null)
                 return false;

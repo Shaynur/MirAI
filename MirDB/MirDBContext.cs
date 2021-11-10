@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using MirAI.AI;
-using System;
 
 namespace MirAI.DB
 {
