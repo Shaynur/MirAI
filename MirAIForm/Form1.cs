@@ -46,12 +46,13 @@ namespace MirAI.Forma
             Program p = listBox1.SelectedItem as Program;
             if (curentProgram != p)
             {
+                selectedUnit = -1;
                 if (curentProgram != null) curentProgram.Save();
                 curentProgram = p;
                 RedrawProgram();
             }
         }
-        public void RedrawProgram()
+        private void RedrawProgram()
         {
             panel1.SuspendLayout();
             panel1.Controls.Clear();
@@ -61,7 +62,7 @@ namespace MirAI.Forma
                 AddUnit(curentProgram.Nodes[i]);
             }
             panel1.ResumeLayout(false);
-            selectedUnit = -1;
+            //selectedUnit = -1;
             Refresh();
         }
         private UnitUI AddUnit(Node node)
@@ -116,11 +117,12 @@ namespace MirAI.Forma
                 if (mouseSize - linkSize < 0.2)
                 {
                     line.fromNode.RemoveChildNode(line.toNode);
-                    //curentProgram.Save();
                     Refresh();
-                    break;
+                    return;
                 }
             }
+            selectedUnit = -1;
+            Refresh();
         }
 
         private float LineLenght(PointF pt1, PointF pt2)
@@ -320,6 +322,7 @@ namespace MirAI.Forma
                 panel1.Controls.Remove(units[selectedUnit]);
                 units.RemoveAt(selectedUnit);
                 curentProgram.Reload();
+                selectedUnit = -1;
                 RedrawProgram();
             }
         }
