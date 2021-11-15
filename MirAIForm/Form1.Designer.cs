@@ -32,6 +32,9 @@ namespace MirAI.Forma
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.panel1 = new System.Windows.Forms.Panel();
+            this.statusBar = new System.Windows.Forms.StatusStrip();
+            this.statusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.statusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.itemBoxMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.MenuItemAddProg = new System.Windows.Forms.ToolStripMenuItem();
@@ -54,6 +57,7 @@ namespace MirAI.Forma
             this.helpToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.statusBar.SuspendLayout();
             this.itemBoxMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -72,12 +76,45 @@ namespace MirAI.Forma
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(761, 551);
+            this.panel1.Size = new System.Drawing.Size(761, 475);
             this.panel1.TabIndex = 1;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             this.panel1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseDown);
             this.panel1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseMove);
             this.panel1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseUp);
+            // 
+            // statusBar
+            // 
+            this.statusBar.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.statusBar.Font = new System.Drawing.Font("Segoe UI Semibold", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.statusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.statusLabel1,
+            this.statusLabel2});
+            this.statusBar.Location = new System.Drawing.Point(0, 500);
+            this.statusBar.Name = "statusBar";
+            this.statusBar.Size = new System.Drawing.Size(950, 29);
+            this.statusBar.TabIndex = 0;
+            this.statusBar.Text = "statusStrip1";
+            // 
+            // statusLabel1
+            // 
+            this.statusLabel1.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.statusLabel1.BorderStyle = System.Windows.Forms.Border3DStyle.Sunken;
+            this.statusLabel1.Name = "statusLabel1";
+            this.statusLabel1.Size = new System.Drawing.Size(100, 24);
+            this.statusLabel1.Text = "DB file name";
+            // 
+            // statusLabel2
+            // 
+            this.statusLabel2.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.statusLabel2.BorderStyle = System.Windows.Forms.Border3DStyle.Sunken;
+            this.statusLabel2.Name = "statusLabel2";
+            this.statusLabel2.Size = new System.Drawing.Size(94, 24);
+            this.statusLabel2.Text = "Prog lenght";
             // 
             // listBox1
             // 
@@ -89,11 +126,12 @@ namespace MirAI.Forma
             this.listBox1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(128)))));
             this.listBox1.FormattingEnabled = true;
             this.listBox1.HorizontalScrollbar = true;
+            this.listBox1.IntegralHeight = false;
             this.listBox1.ItemHeight = 21;
             this.listBox1.Location = new System.Drawing.Point(0, 25);
             this.listBox1.MinimumSize = new System.Drawing.Size(180, 4);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(184, 526);
+            this.listBox1.Size = new System.Drawing.Size(184, 450);
             this.listBox1.Sorted = true;
             this.listBox1.TabIndex = 0;
             this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
@@ -148,7 +186,7 @@ namespace MirAI.Forma
             this.splitContainer1.Panel2.Controls.Add(this.panel1);
             this.splitContainer1.Panel2.Cursor = System.Windows.Forms.Cursors.Default;
             this.splitContainer1.Panel2MinSize = 300;
-            this.splitContainer1.Size = new System.Drawing.Size(950, 551);
+            this.splitContainer1.Size = new System.Drawing.Size(950, 475);
             this.splitContainer1.SplitterDistance = 184;
             this.splitContainer1.SplitterWidth = 5;
             this.splitContainer1.TabIndex = 3;
@@ -314,15 +352,18 @@ namespace MirAI.Forma
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(950, 576);
+            this.ClientSize = new System.Drawing.Size(950, 529);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.toolStrip2);
+            this.Controls.Add(this.statusBar);
             this.DoubleBuffered = true;
             this.KeyPreview = true;
             this.Name = "Form1";
             this.Text = "MirAI";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyUp);
+            this.statusBar.ResumeLayout(false);
+            this.statusBar.PerformLayout();
             this.itemBoxMenu.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel1.PerformLayout();
@@ -363,6 +404,9 @@ namespace MirAI.Forma
         private System.Windows.Forms.ToolStripButton helpToolStripButton;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
+        private System.Windows.Forms.StatusStrip statusBar;
+        private System.Windows.Forms.ToolStripStatusLabel statusLabel1;
+        private System.Windows.Forms.ToolStripStatusLabel statusLabel2;
     }
 }
 

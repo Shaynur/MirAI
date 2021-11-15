@@ -24,8 +24,11 @@ namespace MirAI.Forma {
             curentProgram = null;
             listBox1.DataSource = null;
             listBox1.Items.Clear();
+            statusLabel1.Text = "";
+            selectedUnit = -1;
             try {
                 listBox1.DataSource = Program.GetListPrograms();
+                statusLabel1.Text = Path.GetFileName( MirDBContext.DBFileName );
             }
             catch (Exception ex) {
                 MessageBox.Show( ex.Message, "Ошибка чтения БД", MessageBoxButtons.OK, MessageBoxIcon.Error );
@@ -37,7 +40,6 @@ namespace MirAI.Forma {
             } else {
                 RedrawProgram();
             }
-
         }
 
         private void listBox1_SelectedIndexChanged( object sender, EventArgs e ) {
@@ -57,6 +59,20 @@ namespace MirAI.Forma {
                 AddUnit( curentProgram.Nodes[i] );
             }
             panel1.ResumeLayout( false );
+            if (curentProgram != null) {
+                List<Program> programs = listBox1.DataSource as List<Program>;
+                if (curentProgram.CheckLenght( out int len, ref programs )) {
+                    statusLabel2.BackColor = SystemColors.Control;
+                    statusLabel2.Text = "Размер " + curentProgram.Name + " =  " + len.ToString() + " / " + Program.MaxLenght.ToString();
+                } else {
+                    statusLabel2.BackColor = Color.Red;
+                    statusLabel2.Text = "Размер " + curentProgram.Name + "  > " + Program.MaxLenght.ToString();
+                }
+            }
+            else {
+                statusLabel2.BackColor = SystemColors.Control;
+                statusLabel2.Text = string.Empty;
+            }
             //selectedUnit = -1;
             Refresh();
         }
@@ -104,7 +120,8 @@ namespace MirAI.Forma {
                 float mouseSize = LineLenght(line.from, e.Location) + LineLenght(line.to, e.Location);  // от концов до мышки
                 if (mouseSize - linkSize < 0.2) {
                     line.fromNode.RemoveChildNode( line.toNode );
-                    Refresh();
+                    RedrawProgram();
+                    //Refresh();
                     return;
                 }
             }
@@ -219,7 +236,6 @@ namespace MirAI.Forma {
                     default:
                     break;
                 }
-
                 Node node = curentProgram.AddNode(unit.refNode, newNodeType);
                 switch (newNodeType) {
                     case NodeType.SubAI:
@@ -271,7 +287,6 @@ namespace MirAI.Forma {
             else
                 selectedUnit = -1;
         }
-        //---------------------------------------------------------
 
         private void Form1_KeyUp( object sender, KeyEventArgs e ) {
             //MessageBox.Show($"KeyUp code: {e.KeyCode}, value: {e.KeyValue}");

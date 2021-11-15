@@ -24,7 +24,7 @@ namespace MirAI.AI {
         /// Максимальная длинна программы ( учитываются только ноды действия и ноды условий.
         /// Длинну можно проверить функцией 'CheckProgram()'
         /// </summary>
-        public static int MaxLenght { get; set; } = 10;
+        public static int MaxLenght { get; set; } = 500;
         public Program() { }
         public Program( string name ) {
             Name = name;
@@ -196,6 +196,11 @@ namespace MirAI.AI {
             return null;
         }
 
+        public bool CheckLenght( out int lenght, ref List<Program> programs ) {
+            lenght = 0;
+            return CheckProgram( ref lenght, ref programs );
+        }
+
         /// <summary>
         /// Подсчет длины программы с учетом всех подпрограмм и проверка на превышение максимального
         /// размера (Program.MaxLenght)
@@ -204,7 +209,7 @@ namespace MirAI.AI {
         /// <param name="programs">Ссылка на список всех программ для возможности
         /// переходов на подпрограммы</param>
         /// <returns>true если размер не превышает Program.MaxLenght, false если превышает</returns>
-        public bool CheckProgram( ref int lenght, ref List<Program> programs ) {
+        private bool CheckProgram( ref int lenght, ref List<Program> programs ) {
             Node curnode = this.GetRootNode();
             if (!(curnode is null)) {
                 UnDiscover();
@@ -228,8 +233,9 @@ namespace MirAI.AI {
                             node.discovered = true;
                             if (node.LinkTo.Count > 0) {
                                 Program nextprog = programs.Find(p => p.Id == node.LinkTo[0].To.ProgramId);
-                                if (!nextprog.CheckProgram( ref lenght, ref programs ))
+                                if (!nextprog.CheckProgram( ref lenght, ref programs )) {
                                     return false;
+                                }
                             }
                             break;
                         }

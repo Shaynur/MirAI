@@ -18,7 +18,6 @@ namespace MirAI.DB {
         }
 
         protected override void OnConfiguring( DbContextOptionsBuilder optionsBuilder ) {
-            //Console.WriteLine( DBFileName );
             optionsBuilder.UseSqlite( @"data source=" + DBFileName );
             //optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
         }
