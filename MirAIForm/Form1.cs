@@ -3,6 +3,7 @@ using MirAI.DB;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 
 namespace MirAI.Forma {
@@ -23,7 +24,12 @@ namespace MirAI.Forma {
             curentProgram = null;
             listBox1.DataSource = null;
             listBox1.Items.Clear();
-            listBox1.DataSource = Program.GetListPrograms();
+            try {
+                listBox1.DataSource = Program.GetListPrograms();
+            }
+            catch (Exception ex) {
+                MessageBox.Show( ex.Message, "Ошибка чтения БД", MessageBoxButtons.OK, MessageBoxIcon.Error );
+            }
             listBox1.DisplayMember = "Name";
             if (listBox1.Items.Count > 0) {
                 listBox1.SelectedIndex = listBox1.TopIndex;
@@ -299,6 +305,8 @@ namespace MirAI.Forma {
         private void MenuItemAddProg_Click( object sender, EventArgs e ) {
             List<string> progNames = new List<string>();
             List<Program> programs = (List<Program>)listBox1.DataSource;
+            if (programs is null)
+                return;
             foreach (var p in programs) {
                 progNames.Add( p.Name );
             }
@@ -333,6 +341,24 @@ namespace MirAI.Forma {
                     listBox1.SelectedIndex = listBox1.FindString( selprog.Name );
                 }
                 ibox.Dispose();
+            }
+        }
+
+        private void openToolStripButton_Click( object sender, EventArgs e ) {
+            openFileDialog1.InitialDirectory = Path.GetDirectoryName( MirDBContext.DBFileName );
+            openFileDialog1.FileName = string.Empty;
+            if (openFileDialog1.ShowDialog() == DialogResult.OK) {
+                MirDBContext.DBFileName = openFileDialog1.FileName;
+                Form1_Load( sender, e );
+            }
+        }
+
+        private void newToolStripButton_Click( object sender, EventArgs e ) {
+            saveFileDialog1.InitialDirectory = Path.GetDirectoryName( MirDBContext.DBFileName );
+            saveFileDialog1.FileName = string.Empty;
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK) {
+                MirDBContext.DBFileName = saveFileDialog1.FileName;
+                Form1_Load( sender, e );
             }
         }
     }
