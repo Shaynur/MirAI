@@ -55,6 +55,8 @@ namespace MirAI.Forma
             this.pasteToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.helpToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.unitsToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.statusBar.SuspendLayout();
@@ -248,7 +250,9 @@ namespace MirAI.Forma
             this.copyToolStripButton,
             this.pasteToolStripButton,
             this.toolStripSeparator1,
-            this.helpToolStripButton});
+            this.helpToolStripButton,
+            this.toolStripSeparator2,
+            this.unitsToolStripButton});
             this.toolStrip2.Location = new System.Drawing.Point(0, 0);
             this.toolStrip2.Name = "toolStrip2";
             this.toolStrip2.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
@@ -336,6 +340,23 @@ namespace MirAI.Forma
             this.helpToolStripButton.Size = new System.Drawing.Size(23, 22);
             this.helpToolStripButton.Text = "He&lp";
             // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.AutoSize = false;
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(25, 25);
+            // 
+            // unitsToolStripButton
+            // 
+            this.unitsToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.unitsToolStripButton.Image = global::MirAIForm.Properties.Resources.Units;
+            this.unitsToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.unitsToolStripButton.Name = "unitsToolStripButton";
+            this.unitsToolStripButton.Size = new System.Drawing.Size(23, 22);
+            this.unitsToolStripButton.Text = "toolStripButton1";
+            this.unitsToolStripButton.ToolTipText = "Units";
+            this.unitsToolStripButton.Click += new System.EventHandler(this.unitsToolStripButton_Click);
+            // 
             // openFileDialog1
             // 
             this.openFileDialog1.AddExtension = false;
@@ -407,6 +428,8 @@ namespace MirAI.Forma
         private System.Windows.Forms.StatusStrip statusBar;
         private System.Windows.Forms.ToolStripStatusLabel statusLabel1;
         private System.Windows.Forms.ToolStripStatusLabel statusLabel2;
+        private System.Windows.Forms.ToolStripButton unitsToolStripButton;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
     }
 }
 

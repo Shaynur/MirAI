@@ -376,5 +376,10 @@ namespace MirAI.Forma {
                 Form1_Load( sender, e );
             }
         }
+
+        private void unitsToolStripButton_Click( object sender, EventArgs e ) {
+            Simulation sf = new Simulation();
+            sf.ShowDialog();
+        }
     }
 }
