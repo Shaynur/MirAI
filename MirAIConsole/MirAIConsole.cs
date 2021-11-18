@@ -29,8 +29,7 @@ namespace MirAI
             }
 
             Program prog = programs[0];
-            int len = 0;
-            Console.WriteLine($"\nКорректная длина программы? {prog.CheckProgram(ref len, ref programs)}");
+            Console.WriteLine($"\nКорректная длина программы? {prog.CheckLenght(out int len, ref programs)}");
             Console.WriteLine($"Длина программы '{prog.Name}' (только Action и Condition с учетом подпрограмм): {len}");
 
             Console.WriteLine($"Запуск программы '{prog.Name}'.");

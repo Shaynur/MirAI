@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace MirAI.Forma {
     public partial class Form1 : Form {
-        private List<UnitUI> units = new List<UnitUI>();
+        private readonly List<UnitUI> units = new List<UnitUI>();
         public Program curentProgram;
         private static Pen linkPen = new Pen( UnitUI.linkColor, 5 );
         private static Pen selectPen = new Pen(Color.Red, 3);
@@ -68,8 +68,7 @@ namespace MirAI.Forma {
                     statusLabel2.BackColor = Color.Red;
                     statusLabel2.Text = "Размер " + curentProgram.Name + "  > " + Program.MaxLenght.ToString();
                 }
-            }
-            else {
+            } else {
                 statusLabel2.BackColor = SystemColors.Control;
                 statusLabel2.Text = string.Empty;
             }
@@ -266,7 +265,7 @@ namespace MirAI.Forma {
                     "", MessageBoxButtons.OK, MessageBoxIcon.Warning );
                 return false;
             }
-            var selpform = new SelectProgram(listBox1.DataSource, curentProgram.Name);
+            var selpform = new SelectProgram( listBox1.DataSource, curentProgram.Name );
             DialogResult dr = selpform.ShowDialog(this);
             string subprogname = selpform.selectedProgram;
             selpform.Dispose();
@@ -378,7 +377,7 @@ namespace MirAI.Forma {
         }
 
         private void unitsToolStripButton_Click( object sender, EventArgs e ) {
-            Simulation sf = new Simulation();
+            Simulation sf = new Simulation( listBox1.DataSource );
             sf.ShowDialog();
         }
     }
