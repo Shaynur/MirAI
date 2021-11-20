@@ -11,7 +11,8 @@ namespace MirAI.Forma {
     public partial class Simulation : Form {
         private List<Unit> units;
         private List<Program> programs;
-
+        private int Tick = 0;
+        private Font fnt = new Font("Arial",10);
         public Simulation( object dataSource ) {
             InitializeComponent();
             programs = (List<Program>)dataSource;
@@ -45,7 +46,33 @@ namespace MirAI.Forma {
         }
 
         private void startStripButton_Click( object sender, EventArgs e ) {
-            //TODO старт симуляции
+            if( Tick == 0 ) {
+                gameSceneLoad();
+            }
+            timer1.Enabled = true;
         }
+
+        private void stopStripButton_Click( object sender, EventArgs e ) {
+            timer1.Enabled = false;
+            Tick = 0;
+        }
+
+        private void timer1_Tick( object sender, EventArgs e ) {
+            Tick++;
+            //TODO расчет действий юнитов
+            gameScene.Refresh();
+        }
+
+        private void gameScene_Paint( object sender, PaintEventArgs e ) {
+            Graphics g = e.Graphics;
+            if (timer1.Enabled) {
+                g.DrawString( "Tick = " + Tick.ToString(), fnt, Brushes.Blue, new Point( 10, 10 ) );
+            }
+        }
+
+        private void gameSceneLoad() {
+                //TODO инициализация сцены перед стартом симуляции
+        }
+            
     }
 }

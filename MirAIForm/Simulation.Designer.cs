@@ -30,6 +30,7 @@ namespace MirAI.Forma {
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.stopStripButton = new System.Windows.Forms.ToolStripButton();
             this.startStripButton = new System.Windows.Forms.ToolStripButton();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.listView1 = new System.Windows.Forms.ListView();
@@ -40,12 +41,15 @@ namespace MirAI.Forma {
             this.addUnitMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.editUnitMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteUnitMenu = new System.Windows.Forms.ToolStripMenuItem();
+            this.gameScene = new System.Windows.Forms.PictureBox();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.unitMenu.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gameScene)).BeginInit();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -61,6 +65,7 @@ namespace MirAI.Forma {
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripButton1,
             this.toolStripSeparator1,
+            this.stopStripButton,
             this.startStripButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
@@ -84,6 +89,16 @@ namespace MirAI.Forma {
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(25, 25);
             // 
+            // stopStripButton
+            // 
+            this.stopStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.stopStripButton.Image = global::MirAIForm.Properties.Resources.Stop;
+            this.stopStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.stopStripButton.Name = "stopStripButton";
+            this.stopStripButton.Size = new System.Drawing.Size(23, 22);
+            this.stopStripButton.Text = "Stop";
+            this.stopStripButton.Click += new System.EventHandler(this.stopStripButton_Click);
+            // 
             // startStripButton
             // 
             this.startStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -99,16 +114,20 @@ namespace MirAI.Forma {
             this.splitContainer1.Cursor = System.Windows.Forms.Cursors.VSplit;
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer1.Location = new System.Drawing.Point(0, 25);
+            this.splitContainer1.MinimumSize = new System.Drawing.Size(400, 400);
             this.splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
             // 
             this.splitContainer1.Panel1.Controls.Add(this.listView1);
+            this.splitContainer1.Panel1MinSize = 260;
             // 
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.BackColor = System.Drawing.Color.Black;
+            this.splitContainer1.Panel2.Controls.Add(this.gameScene);
             this.splitContainer1.Panel2.ForeColor = System.Drawing.Color.Lime;
+            this.splitContainer1.Panel2MinSize = 240;
             this.splitContainer1.Size = new System.Drawing.Size(895, 599);
             this.splitContainer1.SplitterDistance = 260;
             this.splitContainer1.TabIndex = 2;
@@ -130,6 +149,7 @@ namespace MirAI.Forma {
             this.listView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.listView1.HideSelection = false;
             this.listView1.Location = new System.Drawing.Point(0, 0);
+            this.listView1.MinimumSize = new System.Drawing.Size(260, 260);
             this.listView1.Name = "listView1";
             this.listView1.Size = new System.Drawing.Size(260, 599);
             this.listView1.TabIndex = 0;
@@ -179,9 +199,21 @@ namespace MirAI.Forma {
             this.deleteUnitMenu.Size = new System.Drawing.Size(132, 22);
             this.deleteUnitMenu.Text = "Delete Unit";
             // 
+            // gameScene
+            // 
+            this.gameScene.Cursor = System.Windows.Forms.Cursors.Cross;
+            this.gameScene.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gameScene.Location = new System.Drawing.Point(0, 0);
+            this.gameScene.Name = "gameScene";
+            this.gameScene.Size = new System.Drawing.Size(631, 599);
+            this.gameScene.TabIndex = 0;
+            this.gameScene.TabStop = false;
+            this.gameScene.Paint += new System.Windows.Forms.PaintEventHandler(this.gameScene_Paint);
+            // 
             // timer1
             // 
             this.timer1.Interval = 250;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // Simulation
             // 
@@ -191,14 +223,17 @@ namespace MirAI.Forma {
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.statusStrip1);
+            this.DoubleBuffered = true;
             this.Name = "Simulation";
             this.Text = "Simulation";
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.unitMenu.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.gameScene)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -221,5 +256,7 @@ namespace MirAI.Forma {
         private System.Windows.Forms.ToolStripMenuItem deleteUnitMenu;
         private System.Windows.Forms.ColumnHeader columnHeader3;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.ToolStripButton stopStripButton;
+        private System.Windows.Forms.PictureBox gameScene;
     }
 }
