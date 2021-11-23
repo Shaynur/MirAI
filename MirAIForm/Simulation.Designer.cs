@@ -178,26 +178,28 @@ namespace MirAI.Forma {
             this.editUnitMenu,
             this.deleteUnitMenu});
             this.unitMenu.Name = "unitMenu";
-            this.unitMenu.Size = new System.Drawing.Size(133, 70);
+            this.unitMenu.Size = new System.Drawing.Size(181, 92);
             // 
             // addUnitMenu
             // 
             this.addUnitMenu.Name = "addUnitMenu";
-            this.addUnitMenu.Size = new System.Drawing.Size(132, 22);
+            this.addUnitMenu.Size = new System.Drawing.Size(180, 22);
             this.addUnitMenu.Text = "Add Unit";
             this.addUnitMenu.Click += new System.EventHandler(this.addUnitMenu_Click);
             // 
             // editUnitMenu
             // 
             this.editUnitMenu.Name = "editUnitMenu";
-            this.editUnitMenu.Size = new System.Drawing.Size(132, 22);
+            this.editUnitMenu.Size = new System.Drawing.Size(180, 22);
             this.editUnitMenu.Text = "Edit Unit";
+            this.editUnitMenu.Click += new System.EventHandler(this.editUnitMenu_Click);
             // 
             // deleteUnitMenu
             // 
             this.deleteUnitMenu.Name = "deleteUnitMenu";
-            this.deleteUnitMenu.Size = new System.Drawing.Size(132, 22);
+            this.deleteUnitMenu.Size = new System.Drawing.Size(180, 22);
             this.deleteUnitMenu.Text = "Delete Unit";
+            this.deleteUnitMenu.Click += new System.EventHandler(this.deleteUnitMenu_Click);
             // 
             // gameScene
             // 

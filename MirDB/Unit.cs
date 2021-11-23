@@ -32,6 +32,13 @@ namespace MirAI.AI {
             return units;
         }
 
+        public static void RemoveUnit( Unit unit ) {
+            using var db = new MirDBContext();
+            if (db.Units.Contains( unit )) {
+                db.Units.Remove( unit );
+                db.SaveChanges();
+            }
+        }
         public Unit Save() {
             using var db = new MirDBContext();
             if (!db.Units.Contains( this )) {       // Сначала сохраняем 'Unit'

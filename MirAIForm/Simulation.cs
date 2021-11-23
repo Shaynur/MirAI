@@ -40,10 +40,33 @@ namespace MirAI.Forma {
         private void addUnitMenu_Click( object sender, EventArgs e ) {
             EditUnitForm eu = new EditUnitForm( programs );
             if (eu.ShowDialog() == DialogResult.OK) {
-                eu.CreateUnit();
                 LoadUnits();
             }
             eu.Dispose();
+        }
+
+        private void editUnitMenu_Click( object sender, EventArgs e ) {
+            if (listView1.SelectedItems.Count < 1) {
+                return;
+            }
+            Unit u = (Unit)listView1.SelectedItems[0].Tag;
+            EditUnitForm eu = new EditUnitForm( programs, u );
+            if (eu.ShowDialog() == DialogResult.OK) {
+                LoadUnits();
+            }
+            eu.Dispose();
+        }
+
+        private void deleteUnitMenu_Click( object sender, EventArgs e ) {
+            if (listView1.SelectedItems.Count < 1) {
+                return;
+            }
+            Unit u = (Unit)listView1.SelectedItems[0].Tag;
+            if (MessageBox.Show( "Удалить юнита " + u.Name + "? ", "Внимание",
+                                MessageBoxButtons.OKCancel, MessageBoxIcon.Question ) == DialogResult.Cancel)
+                return;
+            Unit.RemoveUnit( u );
+            LoadUnits();
         }
 
         private void startStripButton_Click( object sender, EventArgs e ) {
@@ -58,7 +81,7 @@ namespace MirAI.Forma {
             Tick = 0;
         }
 
-        static int dd =5;
+        static int dd = 2;
         static int dd2 = dd*2+1;
         int NextDD() => rand.Next( dd2 ) - dd;
         private void timer1_Tick( object sender, EventArgs e ) {
@@ -75,13 +98,12 @@ namespace MirAI.Forma {
             gameScene.Refresh();
         }
 
-        static int radius = 5;
+        static int radius = 8;
         static int diametr = radius * 2;
         private void gameScene_Paint( object sender, PaintEventArgs e ) {
             Graphics g = e.Graphics;
             if (timer1.Enabled) {
                 g.DrawString( "Tick = " + Tick.ToString(), fnt, Brushes.Blue, new Point( 10, 10 ) );
-                //SolidBrush redBrush = new SolidBrush(Color.Red);
                 foreach (var u in units) {
                     g.FillEllipse( Brushes.Green, u.X - radius, u.Y - radius, diametr, diametr );
                 }
@@ -106,6 +128,5 @@ namespace MirAI.Forma {
             }
             return true;
         }
-
     }
 }
