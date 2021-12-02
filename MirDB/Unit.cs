@@ -13,7 +13,8 @@ namespace MirAI.AI {
         public int Id { get; set; }
         public UnitType Type { get; set; }
         public string Name { get; set; }
-        public int ProgramId { get; set; }
+        //public int ProgramId { get; set; }
+        public Program Program { get; set; }
 
         [NotMapped]
         public int X { get; set; }
@@ -26,9 +27,10 @@ namespace MirAI.AI {
 
         public Unit() {
         }
+
         public static List<Unit> GetListUnits() {
             using var db = new MirDBContext();
-            List<Unit> units = db.Units.ToList();
+            List<Unit> units = db.Units.Include( u => u.Program).ThenInclude( p => p.Nodes ).ThenInclude( n => n.LinkTo ).ToList();
             return units;
         }
 
@@ -41,13 +43,14 @@ namespace MirAI.AI {
         }
         public Unit Save() {
             using var db = new MirDBContext();
+            db.Programs.Attach( this.Program );
             if (!db.Units.Contains( this )) {       // Сначала сохраняем 'Unit'
                 db.Units.Add( this );
             } else {
                 var fromdb = db.Units.SingleOrDefault(p => p.Id == this.Id);
                 fromdb.Type = this.Type;
                 fromdb.Name = this.Name;
-                fromdb.ProgramId = this.ProgramId;
+                fromdb.Program = this.Program;
                 db.Update( fromdb );
             }
             db.SaveChanges();
@@ -55,7 +58,8 @@ namespace MirAI.AI {
         }
 
         public override string ToString() {
-            return $"│{Id,-5}│{Type,-15}│{ProgramId,-30}│";
+            //return $"│{Id,-5}│{Type,-15}│{ProgramId,-30}│";
+            return $"│{Id,-5}│{Type,-15}│{Program.Id,-30}│";
         }
     }
 }

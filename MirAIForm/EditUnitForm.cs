@@ -32,7 +32,8 @@ namespace MirAI.Forma {
             }
             _unit.Name = unitNameBox.Text;
             _unit.Type = (UnitType)Enum.Parse( typeof( UnitType ), unitTypeBox.SelectedItem.ToString() );
-            _unit.ProgramId = programs[unitProgramBox.SelectedIndex].Id;
+            //_unit.ProgramId = programs[unitProgramBox.SelectedIndex].Id;
+            _unit.Program = programs[unitProgramBox.SelectedIndex];
             _unit.Save();
         }
 
@@ -61,7 +62,8 @@ namespace MirAI.Forma {
             unitNameBox.Text = _unit.Name;
             unitNameBox.SelectionStart = unitNameBox.Text.Length;
             unitTypeBox.SelectedIndex = unitTypeBox.Items.IndexOf( _unit.Type.ToString() );
-            unitProgramBox.SelectedIndex = unitProgramBox.Items.IndexOf( programs.Find( p => p.Id == _unit.ProgramId ).Name );
+            //unitProgramBox.SelectedIndex = unitProgramBox.Items.IndexOf( programs.Find( p => p.Id == _unit.ProgramId ).Name );
+            unitProgramBox.SelectedIndex = unitProgramBox.Items.IndexOf( _unit.Program.Name );
         }
 
         private void button1_Click( object sender, EventArgs e ) {

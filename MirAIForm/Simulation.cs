@@ -30,7 +30,8 @@ namespace MirAI.Forma {
             foreach (var u in units) {
                 ListViewItem i = new ListViewItem(u.Name);
                 i.SubItems.Add( u.Type.ToString() );
-                i.SubItems.Add( programs.Find( p => p.Id == u.ProgramId ).Name );
+                //i.SubItems.Add( programs.Find( p => p.Id == u.ProgramId ).Name );
+                i.SubItems.Add( u.Program.Name );
                 i.Tag = u;
                 listView1.Items.Add( i );
             }
@@ -89,7 +90,7 @@ namespace MirAI.Forma {
         int NextDD() => rand.Next( dd2 ) - dd;
         private void timer1_Tick( object sender, EventArgs e ) {
             Tick++;
-            int command = units[curUnit].ProgramId
+            int command = units[curUnit].Program.Run(ref programs)?.Command ?? 0;
             //TODO расчет действий юнитов
             foreach (var u in units) {
                 int newx = u.X + NextDD();
@@ -126,7 +127,7 @@ namespace MirAI.Forma {
                 return false;
             }
             foreach (var u in units) {
-                Program p = programs.Find( p => p.Id == u.ProgramId);
+                Program p = u.Program;
                 if (p is null) {
                     MessageBox.Show( "Program for unit (" + u.Id + ", " + u.Name + ") not found", "Error gameSceneLoad()", MessageBoxButtons.OK );
                     return false;

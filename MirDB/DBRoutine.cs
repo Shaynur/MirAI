@@ -84,8 +84,8 @@ namespace MirAI.DB
             Program prog = new Program("ProgAI");
             Program prog2 = new Program("Sub AI");
 
-            //Unit unit = new Unit { UnitProgram = prog };
-            //MirDBRoutines.SaveUnit(unit);
+            Unit unit = new Unit { Program = prog };
+            unit.Save();
 
             // Добавление Нодов
             prog.AddNode(prog.Nodes[0], NodeType.Condition);
