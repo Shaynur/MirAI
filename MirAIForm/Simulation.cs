@@ -88,10 +88,16 @@ namespace MirAI.Forma {
         static int dd2 = dd*2+1;
         int curUnit = 0;
         int NextDD() => rand.Next( dd2 ) - dd;
+
         private void timer1_Tick( object sender, EventArgs e ) {
             Tick++;
             int command = units[curUnit].Program.Run(ref programs)?.Command ?? 0;
-            //TODO расчет действий юнитов
+            if (command != 0) {
+                //TODO расчет действий юнитов
+            }
+            if( ++curUnit >= units.Count ) {
+                curUnit = 0;
+            }
             foreach (var u in units) {
                 int newx = u.X + NextDD();
                 if (newx > 0 && newx < gameScene.Width)

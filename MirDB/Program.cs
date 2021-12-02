@@ -70,8 +70,8 @@ namespace MirAI.AI {
         /// <returns>Добавленный в БД нод</returns>
         public Node AddNode( Node ownerNode, NodeType type ) {
             Node node = new Node(this.Id, type);
-            Nodes.Add( node );
             node.Save();
+            Nodes.Add( node );
             AddLink( ownerNode, node );
             return node;
         }
@@ -115,6 +115,7 @@ namespace MirAI.AI {
                 fromdb.Name = this.Name;
                 db.Update( fromdb );
             }
+            db.SaveChanges();
             foreach (var n in Nodes) {              // Потом сохраняем все ноды этой программы
                 n.Save( db );
             }
@@ -181,7 +182,8 @@ namespace MirAI.AI {
                         case NodeType.SubAI: {
                             node.discovered = true;
                             if (node.LinkTo.Count > 0) {
-                                Node rn = programs.Find(p => p.Id == node.LinkTo[0].To.ProgramId).Run(ref programs);
+                                //Node rn = programs.Find(p => p.Id == node.LinkTo[0].To.ProgramId).Run(ref programs);
+                                Node rn = node.LinkTo[0].To.Program.Run(ref programs);
                                 if (rn != null) {
                                     return rn;
                                 }
@@ -232,7 +234,8 @@ namespace MirAI.AI {
                         case NodeType.SubAI: {
                             node.discovered = true;
                             if (node.LinkTo.Count > 0) {
-                                Program nextprog = programs.Find(p => p.Id == node.LinkTo[0].To.ProgramId);
+                                //Program nextprog = programs.Find(p => p.Id == node.LinkTo[0].To.ProgramId);
+                                Program nextprog = node.LinkTo[0].To.Program;
                                 if (!nextprog.CheckProgram( ref lenght, ref programs )) {
                                     return false;
                                 }

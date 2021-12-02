@@ -16,6 +16,7 @@ namespace MirAI.AI {
     public class Node : IEquatable<Node>, IComparable<Node> {
         public int Id { get; set; }
         public int ProgramId { get; set; }
+        public Program Program { get; set; }
         public NodeType Type { get; set; }
         public int Command { get; set; }
         public int X { get; set; }
@@ -120,7 +121,7 @@ namespace MirAI.AI {
         /// Переопределение метода ToString для класса Node
         /// </summary>
         public override string ToString() {
-            StringBuilder ret = new StringBuilder( $"│{Id,5}│{ProgramId,5}│{Type,-15}│{Command,10}│({X,4},{Y,4})│" );
+            StringBuilder ret = new StringBuilder( $"│{Id,5}│{Program.Id,5}│{Type,-15}│{Command,10}│({X,4},{Y,4})│" );
             if (LinkTo != null && LinkTo.Count > 0) {
                 foreach (NodeLink node in LinkTo) {
                     ret.Append( $"[{node.ToId}]" );

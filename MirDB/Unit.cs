@@ -30,7 +30,7 @@ namespace MirAI.AI {
 
         public static List<Unit> GetListUnits() {
             using var db = new MirDBContext();
-            List<Unit> units = db.Units.Include( u => u.Program).ThenInclude( p => p.Nodes ).ThenInclude( n => n.LinkTo ).ToList();
+            List<Unit> units = db.Units.Include(u => u.Program).ThenInclude(p => p.Nodes).ThenInclude(n => n.LinkTo).ThenInclude(n=>n.To.Program).ToList();
             return units;
         }
 
