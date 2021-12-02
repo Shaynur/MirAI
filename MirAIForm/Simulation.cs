@@ -71,9 +71,11 @@ namespace MirAI.Forma {
 
         private void startStripButton_Click( object sender, EventArgs e ) {
             if (Tick == 0) {
-                gameSceneLoad();
+                timer1.Enabled = gameSceneLoad();
+                curUnit = 0;
+            } else {
+                timer1.Enabled = true;
             }
-            timer1.Enabled = true;
         }
 
         private void stopStripButton_Click( object sender, EventArgs e ) {
@@ -83,9 +85,11 @@ namespace MirAI.Forma {
 
         static int dd = 2;
         static int dd2 = dd*2+1;
+        int curUnit = 0;
         int NextDD() => rand.Next( dd2 ) - dd;
         private void timer1_Tick( object sender, EventArgs e ) {
             Tick++;
+            int command = units[curUnit].ProgramId
             //TODO расчет действий юнитов
             foreach (var u in units) {
                 int newx = u.X + NextDD();
@@ -105,13 +109,22 @@ namespace MirAI.Forma {
             if (timer1.Enabled) {
                 g.DrawString( "Tick = " + Tick.ToString(), fnt, Brushes.Blue, new Point( 10, 10 ) );
                 foreach (var u in units) {
-                    g.FillEllipse( Brushes.Green, u.X - radius, u.Y - radius, diametr, diametr );
+                    Brush br = u.Type switch  {
+                        UnitType.Soldier => Brushes.Red,
+                        UnitType.Worker => Brushes.Blue,
+                        UnitType.Medic => Brushes.Green,
+                        _ => Brushes.White
+                    };
+                    g.FillEllipse( br, u.X - radius, u.Y - radius, diametr, diametr );
                 }
             }
         }
 
         private bool gameSceneLoad() {
             //TODO инициализация сцены перед стартом симуляции
+            if( units.Count == 0 ) {
+                return false;
+            }
             foreach (var u in units) {
                 Program p = programs.Find( p => p.Id == u.ProgramId);
                 if (p is null) {
@@ -119,7 +132,7 @@ namespace MirAI.Forma {
                     return false;
                 }
                 if (p.CheckLenght( out int len, ref programs ) == false) {
-                    MessageBox.Show( "Program for unit (" + u.Id + ", " + u.Name + ") has too much lenght", "Error gameSceneLoad()", MessageBoxButtons.OK );
+                    MessageBox.Show( "Program " + p.Name + " for unit " + u.Name + " has too much lenght", "Error gameSceneLoad()", MessageBoxButtons.OK );
                     return false;
                 }
                 rand = new Random();
